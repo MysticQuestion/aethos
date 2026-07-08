@@ -1,0 +1,23 @@
+[
+  {
+    "name": "modern_us_chart",
+    "status": "pending_reference_verification",
+    "note": "Fixture format exists, but expected planetary ranges must be filled from a trusted external reference before accuracy claims."
+  },
+  {
+    "name": "european_chart",
+    "status": "pending_reference_verification"
+  },
+  {
+    "name": "southern_hemisphere_chart",
+    "status": "pending_reference_verification"
+  },
+  {
+    "name": "historical_dst_sensitive_chart",
+    "status": "pending_reference_verification"
+  },
+  {
+    "name": "unknown_birth_time_chart",
+    "status": "pending_reference_verification"
+  }
+]

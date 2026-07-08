@@ -58,3 +58,18 @@ Aethos does not provide medical, legal, financial, psychiatric, or guaranteed pr
 ## Ephemeris Status
 
 Swiss Ephemeris is not active in this local build. The current provider is a deterministic demo provider with server-side API contracts for future Swiss Ephemeris or external deterministic providers.
+
+## Calculation Service
+
+A standalone FastAPI calculation service is available in `services/calculation`.
+
+```bash
+cd services/calculation
+python -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt
+pytest
+uvicorn app.main:app --reload
+```
+
+Set `AETHOS_CALCULATION_SERVICE_URL` in the Next.js server environment to proxy `/api/aethos/chart` to the calculation service. Demo fallback is controlled by `AETHOS_ALLOW_DEMO_FALLBACK`.

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { jsonError } from "@/lib/api";
 import { createNatalChart } from "@/lib/aethos/astrology/natal";
+import { createServiceNatalChart, getCalculationServiceConfig } from "@/lib/aethos/astrology/providers/calculation-service-client";
 
 const chartSchema = z.object({
   birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -19,11 +20,31 @@ const chartSchema = z.object({
 export async function POST(request: Request) {
   try {
     const input = chartSchema.parse(await request.json());
+    const serviceConfig = getCalculationServiceConfig();
+    if (serviceConfig.url) {
+      try {
+        const serviceResult = await createServiceNatalChart(input);
+        return NextResponse.json({
+          ...serviceResult,
+          providerRoute: "calculation_service"
+        });
+      } catch (error) {
+        if (!serviceConfig.allowDemoFallback) {
+          throw error;
+        }
+      }
+    }
     const natalChart = await createNatalChart(input);
     return NextResponse.json({
       natalChart,
       calculationMetadata: natalChart.metadata,
-      warnings: natalChart.metadata.warnings
+      warnings: [
+        ...natalChart.metadata.warnings,
+        serviceConfig.url
+          ? "Calculation service was unavailable; AETHOS_ALLOW_DEMO_FALLBACK permitted deterministic demo fallback."
+          : "AETHOS_CALCULATION_SERVICE_URL is not configured; deterministic demo provider used."
+      ],
+      providerRoute: "next_demo_fallback"
     });
   } catch (error) {
     return jsonError(error);
