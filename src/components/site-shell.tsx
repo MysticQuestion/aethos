@@ -9,6 +9,7 @@ import {
   Menu,
   NotebookPen,
   Orbit,
+  ShieldAlert,
   Settings2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -20,9 +21,11 @@ const navItems = [
   { href: "/profile", label: "Profile", icon: Orbit },
   { href: "/journal", label: "Journal", icon: NotebookPen },
   { href: "/reports", label: "Reports", icon: FileText },
+  { href: "/timing-lab", label: "Timing Lab", icon: Database },
   { href: "/engine", label: "Engine", icon: Database },
   { href: "/methodology", label: "Method", icon: BookOpenCheck },
-  { href: "/settings", label: "Settings", icon: Settings2 }
+  { href: "/settings", label: "Settings", icon: Settings2 },
+  { href: "/privacy", label: "Privacy", icon: ShieldAlert }
 ];
 
 export function SiteShell({

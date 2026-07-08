@@ -10,9 +10,11 @@ Aethos is a serious symbolic intelligence platform for self-knowledge, timing aw
 - `/profile` structured symbolic profile
 - `/journal` local journal composer and entry history
 - `/reports` deterministic report generation and Markdown preview
+- `/timing-lab` deterministic demo timing windows, source event table, and lab-mode metadata
 - `/engine` inspectable vector/reconciliation engine view
 - `/methodology` responsible methodology and interpretive limits
 - `/settings` storage mode, privacy posture, and local data controls
+- `/privacy` data export/delete posture and sensitive-data notices
 
 ## Local Development
 
@@ -52,3 +54,7 @@ Supabase mode is detected only when both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PU
 ## Responsible Use
 
 Aethos does not provide medical, legal, financial, psychiatric, or guaranteed predictive advice. Timing windows are context markers for reflection and decision-making, not commands.
+
+## Ephemeris Status
+
+Swiss Ephemeris is not active in this local build. The current provider is a deterministic demo provider with server-side API contracts for future Swiss Ephemeris or external deterministic providers.

@@ -6,6 +6,7 @@ import { SiteShell } from "@/components/site-shell";
 import { StatusBadge } from "@/components/status-badge";
 import { TimingWindowCard } from "@/components/aethos/timing-window-card";
 import { ResponsibleUseNote } from "@/components/aethos/responsible-use-note";
+import { ResponsibleUseBoundary } from "@/components/aethos/responsible-use-boundary";
 import { buildDemoKernel } from "@/lib/aethos/demo";
 import { createSampleAethosProfile } from "@/lib/aethos/profile";
 import { generateTimingWindows } from "@/lib/aethos/timing";
@@ -88,6 +89,7 @@ export default function DashboardPage() {
         </aside>
       </section>
       <ResponsibleUseNote compact />
+      <ResponsibleUseBoundary />
     </SiteShell>
   );
 }

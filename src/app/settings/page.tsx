@@ -1,3 +1,4 @@
+import { ResponsibleUseBoundary } from "@/components/aethos/responsible-use-boundary";
 import { ResponsibleUseNote } from "@/components/aethos/responsible-use-note";
 import { SettingsPanel } from "@/components/aethos/settings-panel";
 import { SiteShell } from "@/components/site-shell";
@@ -20,6 +21,7 @@ export default function SettingsPage() {
         </p>
       </section>
       <ResponsibleUseNote compact />
+      <ResponsibleUseBoundary />
     </SiteShell>
   );
 }

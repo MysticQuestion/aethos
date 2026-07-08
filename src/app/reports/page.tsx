@@ -1,4 +1,5 @@
 import { ReportsWorkspace } from "@/components/aethos/reports-workspace";
+import { ResponsibleUseBoundary } from "@/components/aethos/responsible-use-boundary";
 import { ResponsibleUseNote } from "@/components/aethos/responsible-use-note";
 import { SiteShell } from "@/components/site-shell";
 
@@ -11,6 +12,7 @@ export default function ReportsPage() {
     >
       <ReportsWorkspace />
       <ResponsibleUseNote compact />
+      <ResponsibleUseBoundary />
     </SiteShell>
   );
 }

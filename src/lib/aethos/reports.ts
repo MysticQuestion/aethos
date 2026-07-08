@@ -31,6 +31,7 @@ export function generateAethosReport(
     journalObservations,
     confidenceNotes: [
       "Confidence levels describe source clarity, interpretive strength, and user-confirmed relevance.",
+      "Calculation mode may be demo unless a server-side ephemeris provider is configured.",
       profile.isSample ? "This is a sample profile for local demo mode." : "This report is generated from locally available user data.",
       "Time-sensitive systems remain restricted when birth time or location precision is incomplete."
     ],

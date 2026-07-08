@@ -1,4 +1,5 @@
 import { BookOpenCheck } from "lucide-react";
+import { ResponsibleUseBoundary } from "@/components/aethos/responsible-use-boundary";
 import { SiteShell } from "@/components/site-shell";
 
 const steps = [
@@ -36,6 +37,7 @@ export default function MethodologyPage() {
           ))}
         </div>
       </section>
+      <ResponsibleUseBoundary />
     </SiteShell>
   );
 }

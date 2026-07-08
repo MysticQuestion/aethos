@@ -138,7 +138,8 @@ export type ReportType =
   | "timing_brief"
   | "decision_lens"
   | "journal_pattern_summary"
-  | "practitioner_overview";
+  | "practitioner_overview"
+  | "lab_mode_export";
 
 export type AethosReport = {
   id: string;

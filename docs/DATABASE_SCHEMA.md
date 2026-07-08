@@ -1,6 +1,10 @@
 # Database Schema
 
-The working SQL schema is maintained in `supabase/schema.sql`.
+The initial local schema is maintained in `supabase/schema.sql`.
+
+The production-oriented backend data-layer migration is:
+
+- `supabase/migrations/202607080001_aethos_backend_ephemeris_data_layer.sql`
 
 Primary tables:
 
@@ -14,5 +18,16 @@ Primary tables:
 - `timing_windows`
 - `reports`
 - `journal_entries`
+
+Production `aethos_*` tables:
+
+- `aethos_profiles`
+- `aethos_birth_intakes`
+- `aethos_natal_charts`
+- `aethos_transit_events`
+- `aethos_timing_windows`
+- `aethos_journal_entries`
+- `aethos_reports`
+- `aethos_action_experiments`
 
 RLS is enabled for user-owned profile records and child records. RLS is authorization, not zero-knowledge encryption. Journal confidentiality requires separate encryption design.

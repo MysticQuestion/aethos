@@ -75,5 +75,10 @@ export const REPORT_TYPES: Array<{ value: ReportType; label: string; description
     value: "practitioner_overview",
     label: "Practitioner Overview",
     description: "A concise report for collaborative, non-diagnostic review."
+  },
+  {
+    value: "lab_mode_export",
+    label: "Lab Mode Export",
+    description: "Raw calculation metadata, timing windows, theme scores, and interpretation boundaries."
   }
 ];
