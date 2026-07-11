@@ -3,6 +3,10 @@ import { calculateAspect } from "@/lib/aethos/astrology/aspects";
 import { createInputHash, attachCalculationMetadata, validateCalculationMetadata } from "@/lib/aethos/astrology/metadata";
 import { createNatalChart } from "@/lib/aethos/astrology/natal";
 import { demoEphemerisProvider } from "@/lib/aethos/astrology/providers/demo-ephemeris-provider";
+import {
+  normalizeServiceNatalChart,
+  type CalculationServiceNatalResponse
+} from "@/lib/aethos/astrology/providers/calculation-service-client";
 import { detectRetrograde, detectStation } from "@/lib/aethos/astrology/retrogrades";
 import { generateTransitEvents } from "@/lib/aethos/astrology/transits";
 import { aggregateThemeScores, calculateConfidenceScore, generateTimingWindows } from "@/lib/aethos/astrology/timing-windows";
@@ -83,6 +87,85 @@ describe("Aethos backend ephemeris and data layer", () => {
     const two = await demoEphemerisProvider.getPlanetPosition({ ...chartInput, body: "sun", date: "2026-07-08T00:00:00.000Z" });
     expect(one.longitude).toBe(two.longitude);
     expect(one.warnings[0]).toContain("Demo ephemeris provider active");
+  });
+
+  it("normalizes calculation service natal responses into the app chart contract", () => {
+    const serviceResponse: CalculationServiceNatalResponse = {
+      normalizedUtc: "1992-04-18T19:00:00+00:00",
+      planetaryPositions: [
+        {
+          body: "sun",
+          longitude: 28.5,
+          latitude: 0.2,
+          distanceAu: 1,
+          speedLongitude: 0.98,
+          speedLatitude: 0.01,
+          retrograde: false,
+          zodiacPosition: {
+            sign: "Aries",
+            signIndex: 0,
+            degree: 28,
+            minute: 30,
+            second: 0,
+            formatted: "28° 30' 0\" Aries"
+          },
+          providerMetadata: {
+            providerId: "aethos-demo-calculation-provider",
+            calculationMode: "demo",
+            warnings: ["demo"]
+          }
+        }
+      ],
+      houses: [
+        {
+          house: 1,
+          longitude: 28.5,
+          zodiacPosition: {
+            sign: "Aries",
+            signIndex: 0,
+            degree: 28,
+            minute: 30,
+            second: 0,
+            formatted: "28° 30' 0\" Aries"
+          }
+        }
+      ],
+      aspects: [
+        {
+          bodyA: "sun",
+          bodyB: "moon",
+          aspectType: "conjunction",
+          exactAngle: 0,
+          orb: 2,
+          applyingSeparating: "applying"
+        }
+      ],
+      calculationMetadata: {
+        calculationId: "calc-test",
+        providerId: "aethos-demo-calculation-provider",
+        providerVersion: "0.1.0",
+        calculationMode: "demo",
+        generatedAt: "2026-07-11T00:00:00.000Z",
+        inputHash: "abc123def456",
+        timezone: "America/Los_Angeles",
+        coordinates: null,
+        houseSystem: "whole_sign",
+        zodiacMode: "tropical",
+        ephemerisSource: "deterministic-demo-provider",
+        warnings: ["demo"]
+      },
+      warnings: ["demo"]
+    };
+
+    const chart = normalizeServiceNatalChart(serviceResponse, chartInput);
+
+    expect(chart.id).toBe("natal-abc123def456");
+    expect(chart.positions).toHaveLength(1);
+    expect(chart.positions[0].speed.longitudePerDay).toBe(0.98);
+    expect(chart.positions[0].zodiac.longitude).toBe(28.5);
+    expect(chart.houses[0].zodiac.longitude).toBe(28.5);
+    expect(chart.aspects[0]).toMatchObject({ type: "conjunction", applying: true });
+    expect(chart.metadata.warnings).toEqual(["demo"]);
   });
 
   it("generates timing windows and theme scores from demo transits", async () => {

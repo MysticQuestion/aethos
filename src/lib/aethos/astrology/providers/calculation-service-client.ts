@@ -1,7 +1,126 @@
+import type {
+  Aspect,
+  CalculationMetadataV2,
+  CalculationMode,
+  CelestialPosition,
+  HouseCusp,
+  NatalChart,
+  NatalChartInput,
+  Planet,
+  ZodiacPosition
+} from "../types";
+
 export function getCalculationServiceConfig() {
   return {
     url: process.env.AETHOS_CALCULATION_SERVICE_URL,
     allowDemoFallback: process.env.AETHOS_ALLOW_DEMO_FALLBACK !== "false"
+  };
+}
+
+export type CalculationServiceNatalResponse = {
+  normalizedUtc: string;
+  planetaryPositions: Array<{
+    body: Planet;
+    longitude: number;
+    latitude: number;
+    distanceAu?: number;
+    speedLongitude: number;
+    speedLatitude?: number;
+    retrograde: boolean;
+    zodiacPosition: Omit<ZodiacPosition, "longitude">;
+    providerMetadata: {
+      providerId: string;
+      calculationMode: CalculationMode;
+      warnings: string[];
+    };
+  }>;
+  houses: Array<{
+    house: number;
+    longitude: number;
+    zodiacPosition: Omit<ZodiacPosition, "longitude">;
+  }>;
+  aspects: Array<{
+    bodyA: Planet;
+    bodyB: Planet;
+    aspectType: Aspect["type"];
+    exactAngle: number;
+    orb: number;
+    applyingSeparating?: "applying" | "separating";
+  }>;
+  calculationMetadata: Omit<CalculationMetadataV2, "coordinates"> & {
+    serviceVersion?: string;
+    normalizedUtc?: string;
+    coordinates?: CalculationMetadataV2["coordinates"] | null;
+  };
+  warnings: string[];
+};
+
+function normalizeServiceZodiac(position: Omit<ZodiacPosition, "longitude">, longitude: number): ZodiacPosition {
+  return {
+    ...position,
+    longitude
+  };
+}
+
+export function normalizeServiceNatalChart(
+  response: CalculationServiceNatalResponse,
+  input: NatalChartInput
+): NatalChart {
+  const metadata: CalculationMetadataV2 = {
+    calculationId: response.calculationMetadata.calculationId,
+    providerId: response.calculationMetadata.providerId,
+    providerVersion: response.calculationMetadata.providerVersion,
+    calculationMode: response.calculationMetadata.calculationMode,
+    generatedAt: response.calculationMetadata.generatedAt,
+    inputHash: response.calculationMetadata.inputHash,
+    timezone: response.calculationMetadata.timezone,
+    coordinates: response.calculationMetadata.coordinates ?? undefined,
+    houseSystem: response.calculationMetadata.houseSystem,
+    zodiacMode: response.calculationMetadata.zodiacMode,
+    ephemerisSource: response.calculationMetadata.ephemerisSource,
+    warnings: response.warnings.length > 0 ? response.warnings : response.calculationMetadata.warnings
+  };
+
+  const positions: CelestialPosition[] = response.planetaryPositions.map((position) => ({
+    body: position.body,
+    longitude: position.longitude,
+    latitude: position.latitude,
+    distanceAu: position.distanceAu,
+    speed: {
+      longitudePerDay: position.speedLongitude,
+      latitudePerDay: position.speedLatitude
+    },
+    zodiac: normalizeServiceZodiac(position.zodiacPosition, position.longitude),
+    isRetrograde: position.retrograde,
+    calculatedAt: response.calculationMetadata.generatedAt,
+    providerId: position.providerMetadata.providerId,
+    calculationMode: position.providerMetadata.calculationMode,
+    warnings: position.providerMetadata.warnings
+  }));
+
+  const houses: HouseCusp[] = response.houses.map((house) => ({
+    house: house.house,
+    longitude: house.longitude,
+    zodiac: normalizeServiceZodiac(house.zodiacPosition, house.longitude)
+  }));
+
+  const aspects: Aspect[] = response.aspects.map((aspect) => ({
+    id: `${aspect.bodyA}-${aspect.bodyB}-${aspect.aspectType}`,
+    bodyA: aspect.bodyA,
+    bodyB: aspect.bodyB,
+    type: aspect.aspectType,
+    orb: aspect.orb,
+    exactAngle: aspect.exactAngle,
+    applying: aspect.applyingSeparating === "applying"
+  }));
+
+  return {
+    id: `natal-${metadata.inputHash.slice(0, 12)}`,
+    input,
+    positions,
+    houses,
+    aspects,
+    metadata
   };
 }
 
@@ -73,5 +192,5 @@ export async function createServiceNatalChart(input: {
     throw new Error(`Calculation service natal-chart request failed with ${response.status}.`);
   }
 
-  return response.json();
+  return response.json() as Promise<CalculationServiceNatalResponse>;
 }

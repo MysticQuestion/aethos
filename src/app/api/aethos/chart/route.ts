@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { jsonError } from "@/lib/api";
 import { createNatalChart } from "@/lib/aethos/astrology/natal";
-import { createServiceNatalChart, getCalculationServiceConfig } from "@/lib/aethos/astrology/providers/calculation-service-client";
+import {
+  createServiceNatalChart,
+  getCalculationServiceConfig,
+  normalizeServiceNatalChart
+} from "@/lib/aethos/astrology/providers/calculation-service-client";
 
 const chartSchema = z.object({
   birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -24,8 +28,11 @@ export async function POST(request: Request) {
     if (serviceConfig.url) {
       try {
         const serviceResult = await createServiceNatalChart(input);
+        const natalChart = normalizeServiceNatalChart(serviceResult, input);
         return NextResponse.json({
-          ...serviceResult,
+          natalChart,
+          calculationMetadata: natalChart.metadata,
+          warnings: serviceResult.warnings,
           providerRoute: "calculation_service"
         });
       } catch (error) {
