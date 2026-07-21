@@ -85,6 +85,16 @@ export type AethosBirthIntake = {
   };
 };
 
+export type SystemLayerSnapshot = {
+  systemKey: string;
+  label: string;
+  status: "v1" | "research_preview" | "withheld" | "unavailable";
+  confidence: ConfidenceLevel;
+  summary: string;
+  highlights: Array<{ label: string; value: string; note?: string }>;
+  withheld: string[];
+};
+
 export type AethosProfile = {
   id: string;
   displayName: string;
@@ -98,6 +108,7 @@ export type AethosProfile = {
     confidence: ConfidenceLevel;
     source: string;
   }>;
+  systemLayers: SystemLayerSnapshot[];
   strengths: string[];
   tensions: string[];
   timingSensitivities: string[];

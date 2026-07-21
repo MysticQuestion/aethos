@@ -28,6 +28,18 @@ npm run dev
 
 Open `http://127.0.0.1:3000` or `http://localhost:3000`.
 
+Optional full stack (web + calculation service):
+
+```bash
+docker compose up
+```
+
+### Setup guides
+
+- Supabase Auth + migrations: `docs/SUPABASE_SETUP.md`
+- Deploy (Vercel + calc + Swiss): `docs/DEPLOYMENT.md`
+- Multi-system vision: `docs/MULTI_SYSTEM_VISION.md`
+
 ## Verification
 
 ```bash

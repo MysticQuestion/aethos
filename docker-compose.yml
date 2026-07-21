@@ -1,0 +1,39 @@
+services:
+  web:
+    image: node:22-bookworm
+    working_dir: /app
+    volumes:
+      - .:/app
+      - web_node_modules:/app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
+      AETHOS_CALCULATION_SERVICE_URL: http://calculation:8000
+      AETHOS_ALLOW_DEMO_FALLBACK: ${AETHOS_ALLOW_DEMO_FALLBACK:-true}
+    command: sh -c "npm ci && npm run dev -- --hostname 0.0.0.0 --port 3000"
+    depends_on:
+      - calculation
+
+  calculation:
+    build:
+      context: ./services/calculation
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      AETHOS_CALC_PROVIDER: ${AETHOS_CALC_PROVIDER:-demo}
+      AETHOS_ALLOW_DEMO_FALLBACK: ${AETHOS_ALLOW_DEMO_FALLBACK:-true}
+      AETHOS_SWISS_EPHEMERIS_PATH: ${AETHOS_SWISS_EPHEMERIS_PATH:-/ephe}
+    volumes:
+      # Mount licensed Swiss Ephemeris files here when available.
+      - ${AETHOS_SWISS_EPHEMERIS_HOST_PATH:-./services/calculation/ephe}:/ephe:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  web_node_modules:

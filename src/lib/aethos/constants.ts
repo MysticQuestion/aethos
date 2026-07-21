@@ -43,9 +43,9 @@ export const SYMBOLIC_SYSTEMS: Array<{
   status: "v1" | "research_preview" | "deferred";
 }> = [
   { value: "western_astrology", label: "Western astrology", status: "v1" },
-  { value: "human_design", label: "Human Design", status: "v1" },
   { value: "numerology", label: "Numerology", status: "v1" },
   { value: "journaling", label: "Journaling pattern tracking", status: "v1" },
+  { value: "human_design", label: "Human Design", status: "research_preview" },
   { value: "vedic_astrology", label: "Vedic astrology", status: "research_preview" },
   { value: "bazi", label: "BaZi", status: "research_preview" },
   { value: "i_ching", label: "I Ching", status: "research_preview" }

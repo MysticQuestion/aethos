@@ -1,5 +1,6 @@
 import { MetricCard } from "@/components/metric-card";
 import { ProfileSummary } from "@/components/aethos/profile-summary";
+import { SystemLayersPanel } from "@/components/aethos/system-layers-panel";
 import { TimingWindowCard } from "@/components/aethos/timing-window-card";
 import { SiteShell } from "@/components/site-shell";
 import { StatusBadge } from "@/components/status-badge";
@@ -19,6 +20,7 @@ export default function ProfilePage() {
       description="This page separates supported V1 outputs from systems that require higher-resolution data or future engines."
     >
       <ProfileSummary profile={profile} />
+      <SystemLayersPanel layers={profile.systemLayers} />
       <section className="grid gap-4 md:grid-cols-3">
         <MetricCard label="Expression" value={kernel.numerology.expressionNumber ?? "N/A"} detail="Full-name Pythagorean sum" />
         <MetricCard label="Personal Year" value={kernel.numerology.personalYear} detail="Date-based timing layer" />

@@ -2,51 +2,44 @@
 
 ## Built
 
-- Next.js App Router MVP with public, dashboard, onboarding, profile, journal, reports, methodology, engine, timing-lab, settings, privacy, and **account** routes.
-- Local demo mode that works without Supabase environment variables.
-- Typed Aethos modules for intake, profile generation, timing windows, journal themes, reports, storage mode, numerology, Western baseline, semantic dictionary, reconciliation, and insight cards.
-- Report generation as deterministic Markdown output.
-- Journal entry creation with mood, theme, optional decision context, history, and local persistence.
-- Supabase schema with profiles, birth intakes, journal entries, timing windows, reports, calculation runs, semantic fragments, reconciliation runs, insight cards, and RLS policies.
-- FastAPI calculation service (`services/calculation`) with demo provider and optional Swiss Ephemeris adapter.
-- **Supabase Auth + dual-mode persistence (2026-07-20):**
-  - `@supabase/supabase-js` + `@supabase/ssr`
-  - Browser/server clients and session middleware
-  - `/account` magic-link and email/password sign-in
-  - `/auth/callback` code exchange
-  - Cloud mirror for profile, journal, reports when signed in
-  - Push local → cloud / pull cloud → local
-  - Local storage remains source of truth for the browser session
+- Next.js App Router MVP with public, dashboard, onboarding, profile, journal, reports, methodology, engine, timing-lab, settings, privacy, and account routes.
+- Local demo mode without Supabase.
+- Typed modules: intake, profile, timing, journal, reports, numerology, Western baseline, dictionary, reconciliation, insight cards.
+- FastAPI calculation service with demo provider and Swiss Ephemeris adapter (planets + houses when licensed files present).
+- Supabase Auth + dual-mode persistence (push/pull, middleware, `/account`).
+- **Multi-system research engines (2026-07-21):**
+  - Human Design: withhold Type/Authority without verified BodyGraph + time
+  - Vedic: approximate sidereal solar Rashi scaffold; Lagna withheld
+  - BaZi: day/month pillar scaffold; hour pillar withheld
+  - I Ching: deterministic hexagram scaffold (not ritual cast)
+  - Profile `systemLayers` + tabbed multi-system UI
+- **Deploy scaffolding:** `vercel.json`, `docker-compose.yml`, expanded `docs/DEPLOYMENT.md`, `docs/SUPABASE_SETUP.md`
 
-## Consolidated repos
+## Canonical repo
 
-Canonical path: `/Users/micwil/Documents/Aethos`  
-Remote: `https://github.com/MysticQuestion/aethos.git`  
-See `docs/REPO_LAYOUT.md` and `archive/early-desktop-prototype/`.
+https://github.com/MysticQuestion/aethos  
+Local path: `/Users/micwil/Documents/Aethos`
 
-## Deferred
+## Deferred / production next
 
-- Forced protected account routes (intentionally opt-in so demo mode stays open).
-- Server-side writes from API routes (browser-authenticated mirror is first cut).
-- Human Design BodyGraph engine.
-- Vedic, BaZi, I Ching production engines.
-- PDF rendering pipeline.
-- LLM-assisted report prose (Agents’ Room).
-- Practitioner workspace and billing.
-- Swiss Ephemeris production activation + golden chart fixtures.
+- Supabase project creation + apply migrations (operator step)
+- Swiss ephemeris licensed files + golden chart verification
+- True Human Design BodyGraph + Lahiri Swiss Vedic + full BaZi calendar library
+- PDF export pipeline
+- LLM Agents’ Room narrative (server-side only, structured calc inputs)
+- Practitioner workspace + billing
+- Vercel + calc container live deploy (operator step)
 
-## Known Limits
+## Known limits
 
-- Western astrology V1 is a solar baseline and intentionally withholds houses, Ascendant, and time-sensitive claims without sufficient data.
-- Local mode is browser-specific and is not account-synced until the user signs in and pushes/pulls.
-- Report generation is Markdown/HTML-ready only.
-- Birth-intake upsert requires migration `202607200001_aethos_auth_persistence.sql` (unique on `profile_id`, snapshot columns).
+- Research multi-system layers are deterministic scaffolds with explicit withhold lists — not production BodyGraph/Lagna/hour pillar claims.
+- Western V1 solar baseline without Swiss still withholds houses/Ascendant when time unknown.
+- Local mode is browser-specific until account sync.
 
-## Continue From Here
+## Continue From Here (operator)
 
-1. Apply Supabase migrations + configure Auth redirect URLs (`/auth/callback`).
-2. Optional: harden API routes to accept authenticated server-side persistence.
-3. Implement PDF export after report rendering is visually verified.
-4. Activate Swiss Ephemeris with licensed ephemeris files and golden fixtures.
-5. Add multi-system dashboard tabs (see `docs/MULTI_SYSTEM_VISION.md`) as engines land.
-6. Practitioner review workflow after consumer profile and journal data are stable.
+1. Create Supabase project → run migrations → set env + Auth redirects (`docs/SUPABASE_SETUP.md`).
+2. `npx vercel` or import GitHub repo; set env vars (`docs/DEPLOYMENT.md`).
+3. Deploy calculation service container; point `AETHOS_CALCULATION_SERVICE_URL`.
+4. Optionally activate Swiss with licensed ephemeris files.
+5. PDF export and practitioner workflows after consumer data is stable.

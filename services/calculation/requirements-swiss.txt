@@ -1,0 +1,3 @@
+# Optional Swiss Ephemeris extras (install separately after licensing ephemeris files).
+-r requirements.txt
+pyswisseph>=2.10,<3

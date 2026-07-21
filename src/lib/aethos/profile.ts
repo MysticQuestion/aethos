@@ -31,6 +31,42 @@ export function generateAethosProfile(intake: AethosBirthIntake, isSample = fals
   };
   const kernel = buildDemoKernel(normalizedIntake);
   const topInsight = kernel.insights[0];
+  const systemLayers = [
+    {
+      systemKey: "numerology",
+      label: "Numerology",
+      status: "v1" as const,
+      confidence: "high" as const,
+      summary: `Life Path ${kernel.numerology.lifePath}, Personal Year ${kernel.numerology.personalYear}.`,
+      highlights: [
+        { label: "Life Path", value: String(kernel.numerology.lifePath) },
+        { label: "Personal Year", value: String(kernel.numerology.personalYear) }
+      ],
+      withheld: [] as string[]
+    },
+    {
+      systemKey: "western_astrology",
+      label: "Western",
+      status: "v1" as const,
+      confidence: kernel.lowConfidenceMode ? ("medium" as const) : ("high" as const),
+      summary: `Sun in ${kernel.western.sunSign}. Ascendant and houses: ${kernel.western.ascendantStatus}.`,
+      highlights: [
+        { label: "Sun", value: kernel.western.sunSign },
+        { label: "Ascendant", value: kernel.western.ascendantStatus },
+        { label: "Houses", value: kernel.western.housesStatus }
+      ],
+      withheld: kernel.western.metadata.restrictedOutputs
+    },
+    ...kernel.multiSystem.map((layer) => ({
+      systemKey: layer.systemKey,
+      label: layer.label,
+      status: layer.status,
+      confidence: layer.confidence,
+      summary: layer.summary,
+      highlights: layer.highlights,
+      withheld: layer.withheld
+    }))
+  ];
 
   return {
     // UUID required for Supabase aethos_profiles primary key when cloud-synced.
@@ -64,8 +100,15 @@ export function generateAethosProfile(intake: AethosBirthIntake, isSample = fals
         value: normalizedIntake.birthTimeConfidence,
         confidence: confidenceFromBirthTime(normalizedIntake),
         source: "Canonical intake"
-      }
+      },
+      ...kernel.multiSystem.slice(0, 2).map((layer) => ({
+        label: layer.label,
+        value: layer.highlights[0]?.value ?? layer.status,
+        confidence: layer.confidence,
+        source: layer.status === "v1" ? layer.label : `${layer.label} (research)`
+      }))
     ],
+    systemLayers,
     strengths: [
       "Can translate symbolic material into structured reflection.",
       "Benefits from distinguishing intuitive signal from operational next step.",
@@ -74,6 +117,7 @@ export function generateAethosProfile(intake: AethosBirthIntake, isSample = fals
     tensions: [
       "Timing context may feel actionable before supporting data is complete.",
       "Low birth-time precision limits time-sensitive chart claims.",
+      "Multi-system research layers must not be treated as production BodyGraph or Lagna claims.",
       "Symbolic confidence should be checked against lived experience."
     ],
     timingSensitivities: [

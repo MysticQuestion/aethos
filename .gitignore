@@ -30,5 +30,9 @@ __pycache__/
 .mypy_cache/
 .venv/
 
+# Swiss Ephemeris binary data (licensed) — keep directory via .gitkeep
+services/calculation/ephe/*
+!services/calculation/ephe/.gitkeep
+
 # system
 .DS_Store
