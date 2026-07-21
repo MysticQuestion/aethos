@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { StatusBadge } from "@/components/status-badge";
+import { ShowTheMath } from "@/components/aethos/show-the-math";
 import type { SystemLayerSnapshot } from "@/lib/aethos/types";
 
 function toneFor(status: SystemLayerSnapshot["status"]) {
@@ -71,6 +72,9 @@ export function SystemLayersPanel({ layers }: { layers: SystemLayerSnapshot[] })
             </ul>
           </div>
         ) : null}
+        <div className="mt-5">
+          <ShowTheMath title="Show the Math — system layer" data={current} />
+        </div>
       </div>
     </section>
   );

@@ -7,6 +7,8 @@ import type { EngineLayerResult } from "./types";
 
 export type { EngineLayerResult, EngineStatus } from "./types";
 export { calculateBazi, calculateHumanDesign, calculateIChing, calculateVedicBaseline };
+export { castDecisionLens, decisionCastToJournalBody, isCastExpired } from "./decision-lens";
+export type { DecisionCast } from "./decision-lens";
 
 export function runEnabledEngines(intake: AethosBirthIntake): EngineLayerResult[] {
   const results: EngineLayerResult[] = [];

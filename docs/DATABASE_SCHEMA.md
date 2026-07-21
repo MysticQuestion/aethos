@@ -29,5 +29,10 @@ Production `aethos_*` tables:
 - `aethos_journal_entries`
 - `aethos_reports`
 - `aethos_action_experiments`
+- `aethos_calculation_runs` (single-input engine)
+- `aethos_reconciliation_runs`
+- `aethos_decision_casts` (ephemeral Decision Lens)
+
+See also `docs/SINGLE_INPUT_SCHEMA.md` and migration `202607210001_aethos_single_input_engine.sql`.
 
 RLS is enabled for user-owned profile records and child records. RLS is authorization, not zero-knowledge encryption. Journal confidentiality requires separate encryption design.

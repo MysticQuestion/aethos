@@ -15,6 +15,7 @@ Aethos is a serious symbolic intelligence platform for self-knowledge, timing aw
 - `/timing-lab` demo timing windows, source event table, and lab-mode metadata
 - `/engine` inspectable vector/reconciliation engine view
 - `/methodology` responsible methodology and interpretive limits
+- `/decision-lens` I Ching Decision Lens (ephemeral cast, journal archive)
 - `/account` optional Supabase auth + push/pull sync
 - `/settings` storage mode, privacy posture, and local data controls
 - `/privacy` data export/delete posture and sensitive-data notices
@@ -36,6 +37,9 @@ docker compose up
 
 ### Setup guides
 
+- Systems Codex: `docs/SYSTEMS_CODEX.md`
+- Competitor map (30 tools): `docs/COMPETITOR_MAP.md`
+- Single-input schema: `docs/SINGLE_INPUT_SCHEMA.md`
 - Supabase Auth + migrations: `docs/SUPABASE_SETUP.md`
 - Deploy (Vercel + calc + Swiss): `docs/DEPLOYMENT.md`
 - Multi-system vision: `docs/MULTI_SYSTEM_VISION.md`

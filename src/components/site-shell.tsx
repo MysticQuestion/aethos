@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   BookOpenCheck,
+  Compass,
   Database,
   FileText,
   Fingerprint,
@@ -21,6 +22,7 @@ const navItems = [
   { href: "/onboarding", label: "Intake", icon: Fingerprint },
   { href: "/profile", label: "Profile", icon: Orbit },
   { href: "/journal", label: "Journal", icon: NotebookPen },
+  { href: "/decision-lens", label: "Decision", icon: Compass },
   { href: "/reports", label: "Reports", icon: FileText },
   { href: "/timing-lab", label: "Timing Lab", icon: Database },
   { href: "/engine", label: "Engine", icon: Database },
