@@ -10,7 +10,8 @@ import {
   NotebookPen,
   Orbit,
   ShieldAlert,
-  Settings2
+  Settings2,
+  UserRound
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +25,7 @@ const navItems = [
   { href: "/timing-lab", label: "Timing Lab", icon: Database },
   { href: "/engine", label: "Engine", icon: Database },
   { href: "/methodology", label: "Method", icon: BookOpenCheck },
+  { href: "/account", label: "Account", icon: UserRound },
   { href: "/settings", label: "Settings", icon: Settings2 },
   { href: "/privacy", label: "Privacy", icon: ShieldAlert }
 ];

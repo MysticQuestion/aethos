@@ -1,0 +1,72 @@
+'use client'
+
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { Star, Zap } from 'lucide-react'
+
+export default function AethosLanding() {
+  const [formData, setFormData] = useState({ name: '', birthDate: '', birthTime: '', place: '' })
+  const [loading, setLoading] = useState(false)
+  const [profile, setProfile] = useState<any>(null)
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setTimeout(() => {
+      setProfile({
+        birth_data: { name: formData.name || "Alex Rivera" },
+        aethos_synthesis: {
+          core_narrative: "Your Aethos profile reveals a powerful Generator with Taurus Sun vitality harmonized by deep emotional wisdom and natural leadership."
+        }
+      })
+      setLoading(false)
+    }, 1000)
+  }
+
+  return (
+    <div className="min-h-screen cosmic-bg">
+      <nav className="fixed top-0 w-full z-50 glass border-b border-white/10">
+        <div className="max-w-6xl mx-auto px-8 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center">
+              <Star className="w-5 h-5" />
+            </div>
+            <div className="font-semibold text-2xl tracking-tighter">AETHOS</div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="pt-20 max-w-4xl mx-auto px-8 pt-24 text-center">
+        <h1 className="text-7xl font-semibold tracking-tighter mb-6">One profile.<br />All the wisdom.</h1>
+        <p className="text-2xl text-white/70 mb-12">Human Design × Vedic × Bazi × Western × Numerology</p>
+
+        <form onSubmit={handleSubmit} className="max-w-md mx-auto glass p-8 rounded-3xl space-y-4">
+          <input type="text" placeholder="Full Name" className="w-full p-3 rounded-xl bg-white/5 border border-white/10" 
+                 value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required />
+          <input type="date" className="w-full p-3 rounded-xl bg-white/5 border border-white/10" 
+                 value={formData.birthDate} onChange={e => setFormData({...formData, birthDate: e.target.value})} required />
+          <input type="time" className="w-full p-3 rounded-xl bg-white/5 border border-white/10" 
+                 value={formData.birthTime} onChange={e => setFormData({...formData, birthTime: e.target.value})} required />
+          <input type="text" placeholder="Birth Place" className="w-full p-3 rounded-xl bg-white/5 border border-white/10" 
+                 value={formData.place} onChange={e => setFormData({...formData, place: e.target.value})} required />
+          
+          <button type="submit" disabled={loading} className="w-full py-4 bg-white text-black rounded-2xl font-medium">
+            {loading ? "Calculating..." : "Generate My Aethos Profile →"}
+          </button>
+        </form>
+      </div>
+
+      {profile && (
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50" onClick={() => setProfile(null)}>
+          <div className="glass p-10 rounded-3xl max-w-lg text-center" onClick={e => e.stopPropagation()}>
+            <div className="text-2xl mb-4">{profile.birth_data.name}'s Aethos</div>
+            <p className="text-lg text-white/90 mb-8">{profile.aethos_synthesis.core_narrative}</p>
+            <button onClick={() => window.location.href = '/profile/demo'} className="px-8 py-3 bg-white text-black rounded-2xl font-medium">
+              View Full Dashboard
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

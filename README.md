@@ -1,18 +1,21 @@
 # Aethos
 
-Aethos is a serious symbolic intelligence platform for self-knowledge, timing awareness, reflective journaling, and practitioner-ready reports. It is designed for interpretation, not fatalism.
+Aethos is a serious symbolic intelligence platform for self-knowledge, timing awareness, reflective journaling, and practitioner-ready reports. It is designed for **interpretation, not fatalism**.
+
+**Canonical codebase:** this repository (`Documents/Aethos`). See `docs/REPO_LAYOUT.md`.
 
 ## Routes
 
 - `/` public Aethos landing page
-- `/onboarding` local profile intake
+- `/onboarding` local profile intake (mirrors to cloud when signed in)
 - `/dashboard` profile, timing, journal, report, and reflection overview
 - `/profile` structured symbolic profile
-- `/journal` local journal composer and entry history
+- `/journal` journal composer and entry history
 - `/reports` deterministic report generation and Markdown preview
-- `/timing-lab` deterministic demo timing windows, source event table, and lab-mode metadata
+- `/timing-lab` demo timing windows, source event table, and lab-mode metadata
 - `/engine` inspectable vector/reconciliation engine view
 - `/methodology` responsible methodology and interpretive limits
+- `/account` optional Supabase auth + push/pull sync
 - `/settings` storage mode, privacy posture, and local data controls
 - `/privacy` data export/delete posture and sensitive-data notices
 
@@ -41,15 +44,25 @@ Aethos works without remote configuration in local demo mode.
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
+
+# Optional calculation service
+AETHOS_CALCULATION_SERVICE_URL=
+AETHOS_ALLOW_DEMO_FALLBACK=true
+AETHOS_CALC_PROVIDER=demo
+AETHOS_SWISS_EPHEMERIS_PATH=
 ```
 
 Only public Supabase anon configuration belongs in browser-visible variables. Do not expose service role keys, private API keys, or deployment tokens client-side.
 
+For Auth, add redirect URL: `{origin}/auth/callback`.
+
 ## Data Modes
 
-Local demo mode stores profile, journal entries, and generated reports in browser `localStorage`.
+**Local demo** stores profile, journal entries, and reports in browser `localStorage`.
 
-Supabase mode is detected only when both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are present. The schema and RLS notes are in `supabase/schema.sql`.
+**Supabase** activates when both public env vars are set. Sign in on `/account` to enable cloud writes (RLS-backed). Local remains the browser session source of truth; use push/pull on Account to sync.
+
+Schema: `supabase/schema.sql` and `supabase/migrations/`.
 
 ## Responsible Use
 
@@ -57,11 +70,9 @@ Aethos does not provide medical, legal, financial, psychiatric, or guaranteed pr
 
 ## Ephemeris Status
 
-Swiss Ephemeris is not active in this local build. The current provider is a deterministic demo provider with server-side API contracts for future Swiss Ephemeris or external deterministic providers.
+Swiss Ephemeris is not active by default. The active provider is a deterministic demo provider with server-side contracts for Swiss Ephemeris or other deterministic providers.
 
 ## Calculation Service
-
-A standalone FastAPI calculation service is available in `services/calculation`.
 
 ```bash
 cd services/calculation
@@ -72,4 +83,4 @@ pytest
 uvicorn app.main:app --reload
 ```
 
-Set `AETHOS_CALCULATION_SERVICE_URL` in the Next.js server environment to proxy `/api/aethos/chart` to the calculation service. Demo fallback is controlled by `AETHOS_ALLOW_DEMO_FALLBACK`.
+Set `AETHOS_CALCULATION_SERVICE_URL` in the Next.js server environment to proxy `/api/aethos/chart` to the calculation service.

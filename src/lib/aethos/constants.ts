@@ -5,7 +5,8 @@ export const RESPONSIBLE_USE_NOTE =
 
 export const STORAGE_MODE_COPY = {
   local_demo: "Local mode: data is stored in this browser only.",
-  supabase: "Supabase mode: public Supabase environment variables are configured."
+  supabase:
+    "Supabase mode: public env is configured. Sign in on Account to mirror profile, journal, and reports to the cloud."
 } as const;
 
 export const USER_INTENTIONS: Array<{ value: UserIntention; label: string; description: string }> = [

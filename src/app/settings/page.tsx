@@ -1,8 +1,9 @@
+import Link from "next/link";
 import { ResponsibleUseBoundary } from "@/components/aethos/responsible-use-boundary";
 import { ResponsibleUseNote } from "@/components/aethos/responsible-use-note";
 import { SettingsPanel } from "@/components/aethos/settings-panel";
 import { SiteShell } from "@/components/site-shell";
-import { getSupabaseConfigStatus } from "@/lib/supabase/client";
+import { getSupabaseConfigStatus } from "@/lib/supabase/env";
 
 export default function SettingsPage() {
   const supabase = getSupabaseConfigStatus();
@@ -17,7 +18,12 @@ export default function SettingsPage() {
       <section className="aethos-panel rounded-md p-5">
         <h2 className="text-lg font-semibold">Supabase configuration</h2>
         <p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">
-          Status: {supabase.configured ? "configured" : "not configured"}. Required public variables: {supabase.requiredEnv.join(", ")}.
+          Status: {supabase.configured ? "configured" : "not configured"}. Required public variables:{" "}
+          {supabase.requiredEnv.join(", ")}. Sign in and sync from{" "}
+          <Link href="/account" className="font-semibold text-[var(--ochre)] underline-offset-2 hover:underline">
+            Account
+          </Link>
+          .
         </p>
       </section>
       <ResponsibleUseNote compact />

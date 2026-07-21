@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Aethos Phase 1 Kernel",
+  title: "Aethos",
   description:
-    "Transparent symbolic identity intelligence with deterministic calculations, confidence labels, and inspectable engine metadata."
+    "Symbolic identity and timing intelligence — interpretation, not fatalism. Deterministic calculations, confidence labels, and inspectable engine metadata."
 };
 
 export default function RootLayout({

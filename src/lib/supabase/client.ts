@@ -1,10 +1,12 @@
-export function hasSupabasePublicConfig() {
-  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-}
+import { createBrowserClient } from "@supabase/ssr";
+import { getSupabasePublicEnv, hasSupabasePublicConfig, getSupabaseConfigStatus } from "./env";
 
-export function getSupabaseConfigStatus() {
-  return {
-    configured: hasSupabasePublicConfig(),
-    requiredEnv: ["NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_ANON_KEY"]
-  };
+export { hasSupabasePublicConfig, getSupabaseConfigStatus };
+
+export function createSupabaseBrowserClient() {
+  if (!hasSupabasePublicConfig()) {
+    return null;
+  }
+  const { url, anonKey } = getSupabasePublicEnv();
+  return createBrowserClient(url, anonKey);
 }

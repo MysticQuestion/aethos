@@ -6,6 +6,7 @@ import { USER_INTENTIONS, SYMBOLIC_SYSTEMS } from "@/lib/aethos/constants";
 import { demoIntake } from "@/lib/aethos/demo";
 import { generateAethosProfile } from "@/lib/aethos/profile";
 import { emptyAethosState, loadLocalAethosState, saveLocalAethosState } from "@/lib/aethos/storage";
+import { mirrorProfileToCloud } from "@/lib/aethos/storage/storage-router";
 import type { AethosBirthIntake, UserIntention } from "@/lib/aethos/types";
 
 const steps = ["Identity", "Birth data", "Focus", "Review"];
@@ -28,10 +29,11 @@ export function IntakeStepper() {
     }
   });
   const [saved, setSaved] = useState(false);
+  const [syncNote, setSyncNote] = useState<string | null>(null);
 
   const progress = useMemo(() => ((step + 1) / steps.length) * 100, [step]);
 
-  function saveProfile() {
+  async function saveProfile() {
     const profile = generateAethosProfile(
       {
         ...form,
@@ -47,6 +49,16 @@ export function IntakeStepper() {
       updatedAt: new Date().toISOString()
     });
     setSaved(true);
+    try {
+      const mirror = await mirrorProfileToCloud(profile);
+      setSyncNote(
+        mirror.mirrored
+          ? "Also mirrored to Supabase for your signed-in account."
+          : "Saved locally. Cloud mirror skipped (sign in on Account when ready)."
+      );
+    } catch {
+      setSyncNote("Saved locally. Cloud mirror failed — check Account / Supabase status.");
+    }
   }
 
   return (
@@ -189,10 +201,13 @@ export function IntakeStepper() {
               Aethos will save a usable local profile, with unknown birth-time restrictions applied automatically.
             </p>
             {saved ? (
-              <p className="mt-4 flex items-center gap-2 text-sm font-semibold text-[var(--teal)]">
-                <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
-                Profile saved locally.
-              </p>
+              <div className="mt-4 grid gap-2">
+                <p className="flex items-center gap-2 text-sm font-semibold text-[var(--teal)]">
+                  <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+                  Profile saved locally.
+                </p>
+                {syncNote ? <p className="text-sm leading-6 text-[var(--ink-soft)]">{syncNote}</p> : null}
+              </div>
             ) : null}
           </div>
         ) : null}

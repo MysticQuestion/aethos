@@ -33,7 +33,12 @@ export function generateAethosProfile(intake: AethosBirthIntake, isSample = fals
   const topInsight = kernel.insights[0];
 
   return {
-    id: isSample ? "sample-profile" : `profile-${Date.now()}`,
+    // UUID required for Supabase aethos_profiles primary key when cloud-synced.
+    id: isSample
+      ? "00000000-0000-4000-8000-0000000000aa"
+      : typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `00000000-0000-4000-8000-${Date.now().toString(16).padStart(12, "0").slice(-12)}`,
     displayName: normalizedIntake.displayName,
     isSample,
     generatedAt: new Date().toISOString(),
