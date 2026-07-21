@@ -29,4 +29,17 @@ pytest
 
 ## Provider Status
 
-Swiss Ephemeris is not active unless `pyswisseph` is installed, `AETHOS_CALC_PROVIDER=swiss`, and `AETHOS_SWISS_EPHEMERIS_PATH` points to available ephemeris files. Demo mode is deterministic but not astronomical precision.
+| Mode | Env | Notes |
+| --- | --- | --- |
+| demo | `AETHOS_CALC_PROVIDER=demo` | Deterministic samples, not astronomical |
+| swiss + moshier | `AETHOS_CALC_PROVIDER=swiss` `AETHOS_SWISS_EPHEMERIS_MODE=moshier` | Built-in ephemeris; golden CI |
+| swiss + files | `AETHOS_CALC_PROVIDER=swiss` `AETHOS_SWISS_EPHEMERIS_MODE=files` + path | Licensed SE files |
+
+```bash
+pip install -r requirements-swiss.txt
+AETHOS_CALC_PROVIDER=swiss AETHOS_SWISS_EPHEMERIS_MODE=moshier \
+  AETHOS_ALLOW_DEMO_FALLBACK=false pytest tests/test_golden_charts.py -v
+```
+
+Regenerate goldens: `python scripts/generate_golden_charts.py`  
+Details: `docs/CALCULATION_VERIFICATION.md`

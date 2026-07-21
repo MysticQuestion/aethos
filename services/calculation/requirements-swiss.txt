@@ -1,3 +1,4 @@
-# Optional Swiss Ephemeris extras (install separately after licensing ephemeris files).
+# Swiss / Moshier extras for golden charts and production calc.
+# Moshier works without licensed .se1 files. Licensed files use FLG_SWIEPH + AETHOS_SWISS_EPHEMERIS_PATH.
 -r requirements.txt
 pyswisseph>=2.10,<3

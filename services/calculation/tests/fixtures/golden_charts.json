@@ -1,0 +1,478 @@
+{
+  "schemaVersion": 1,
+  "suite": "aethos-swiss-golden-charts",
+  "generatedBy": "scripts/generate_golden_charts.py",
+  "ephemerisMode": "moshier",
+  "failurePolicy": "Any body longitude delta > toleranceDegrees fails the build when AETHOS_CALC_PROVIDER=swiss.",
+  "charts": [
+    {
+      "name": "modern_us_chart",
+      "status": "verified_moshier_reference",
+      "reference": {
+        "source": "pyswisseph Moshier (FLG_MOSEPH)",
+        "note": "CI golden charts use built-in Moshier. Production may use licensed Swiss files (FLG_SWIEPH) with the same fixture schema; regenerate with scripts/generate_golden_charts.py.",
+        "toleranceDegrees": 0.02,
+        "angleToleranceDegrees": 0.05,
+        "sweVersion": 20230604
+      },
+      "input": {
+        "localBirthDate": "1992-04-18",
+        "localBirthTime": "14:30:00",
+        "birthTimeKnown": true,
+        "timezone": "America/Los_Angeles",
+        "latitude": 34.0522,
+        "longitude": -118.2437,
+        "houseSystem": "placidus",
+        "zodiacMode": "tropical",
+        "requestedBodies": [
+          "sun",
+          "moon",
+          "mercury",
+          "venus",
+          "mars",
+          "jupiter",
+          "saturn"
+        ]
+      },
+      "expected": {
+        "normalizedUtc": "1992-04-18T21:30:00+00:00",
+        "julianDay": 2448731.39583333,
+        "bodies": {
+          "sun": {
+            "longitude": 29.086906,
+            "latitude": -0.000173,
+            "speedLongitude": 0.976451,
+            "retrograde": false
+          },
+          "moon": {
+            "longitude": 230.572259,
+            "latitude": -3.394669,
+            "speedLongitude": 13.313573,
+            "retrograde": false
+          },
+          "mercury": {
+            "longitude": 2.46197,
+            "latitude": -2.062256,
+            "speedLongitude": 0.725905,
+            "retrograde": false
+          },
+          "venus": {
+            "longitude": 14.289925,
+            "latitude": -1.483383,
+            "speedLongitude": 1.231916,
+            "retrograde": false
+          },
+          "mars": {
+            "longitude": 346.894833,
+            "latitude": -1.311174,
+            "speedLongitude": 0.773114,
+            "retrograde": false
+          },
+          "jupiter": {
+            "longitude": 154.850592,
+            "latitude": 1.322318,
+            "speedLongitude": -0.036578,
+            "retrograde": true
+          },
+          "saturn": {
+            "longitude": 317.230885,
+            "latitude": -0.753589,
+            "speedLongitude": 0.061623,
+            "retrograde": false
+          }
+        },
+        "angles": {
+          "ascendant": 147.755892,
+          "midheaven": 53.877848
+        },
+        "houseCusps": [
+          147.755892,
+          172.2535,
+          201.230587,
+          233.877848,
+          267.405165,
+          299.038092,
+          327.755892,
+          352.2535,
+          21.230587,
+          53.877848,
+          87.405165,
+          119.038092
+        ],
+        "housesEmpty": false
+      }
+    },
+    {
+      "name": "european_chart",
+      "status": "verified_moshier_reference",
+      "reference": {
+        "source": "pyswisseph Moshier (FLG_MOSEPH)",
+        "note": "CI golden charts use built-in Moshier. Production may use licensed Swiss files (FLG_SWIEPH) with the same fixture schema; regenerate with scripts/generate_golden_charts.py.",
+        "toleranceDegrees": 0.02,
+        "angleToleranceDegrees": 0.05,
+        "sweVersion": 20230604
+      },
+      "input": {
+        "localBirthDate": "1985-07-21",
+        "localBirthTime": "09:15:00",
+        "birthTimeKnown": true,
+        "timezone": "Europe/Paris",
+        "latitude": 48.8566,
+        "longitude": 2.3522,
+        "houseSystem": "placidus",
+        "zodiacMode": "tropical",
+        "requestedBodies": [
+          "sun",
+          "moon",
+          "mercury",
+          "venus",
+          "mars",
+          "jupiter",
+          "saturn"
+        ]
+      },
+      "expected": {
+        "normalizedUtc": "1985-07-21T07:15:00+00:00",
+        "julianDay": 2446267.80208333,
+        "bodies": {
+          "sun": {
+            "longitude": 118.47378,
+            "latitude": 0.000128,
+            "speedLongitude": 0.954883,
+            "retrograde": false
+          },
+          "moon": {
+            "longitude": 160.249783,
+            "latitude": 4.561785,
+            "speedLongitude": 13.900895,
+            "retrograde": false
+          },
+          "mercury": {
+            "longitude": 143.503336,
+            "latitude": -2.079157,
+            "speedLongitude": 0.5201,
+            "retrograde": false
+          },
+          "venus": {
+            "longitude": 76.375511,
+            "latitude": -2.311121,
+            "speedLongitude": 1.114282,
+            "retrograde": false
+          },
+          "mars": {
+            "longitude": 117.49709,
+            "latitude": 1.052242,
+            "speedLongitude": 0.647971,
+            "retrograde": false
+          },
+          "jupiter": {
+            "longitude": 313.831247,
+            "latitude": -0.82086,
+            "speedLongitude": -0.120684,
+            "retrograde": true
+          },
+          "saturn": {
+            "longitude": 231.484174,
+            "latitude": 2.173499,
+            "speedLongitude": -0.007358,
+            "retrograde": true
+          }
+        },
+        "angles": {
+          "ascendant": 151.044443,
+          "midheaven": 52.511541
+        },
+        "houseCusps": [
+          151.044443,
+          171.899491,
+          198.728375,
+          232.511541,
+          270.020914,
+          303.595392,
+          331.044443,
+          351.899491,
+          18.728375,
+          52.511541,
+          90.020914,
+          123.595392
+        ],
+        "housesEmpty": false
+      }
+    },
+    {
+      "name": "southern_hemisphere_chart",
+      "status": "verified_moshier_reference",
+      "reference": {
+        "source": "pyswisseph Moshier (FLG_MOSEPH)",
+        "note": "CI golden charts use built-in Moshier. Production may use licensed Swiss files (FLG_SWIEPH) with the same fixture schema; regenerate with scripts/generate_golden_charts.py.",
+        "toleranceDegrees": 0.02,
+        "angleToleranceDegrees": 0.05,
+        "sweVersion": 20230604
+      },
+      "input": {
+        "localBirthDate": "1978-11-03",
+        "localBirthTime": "06:45:00",
+        "birthTimeKnown": true,
+        "timezone": "Australia/Sydney",
+        "latitude": -33.8688,
+        "longitude": 151.2093,
+        "houseSystem": "placidus",
+        "zodiacMode": "tropical",
+        "requestedBodies": [
+          "sun",
+          "moon",
+          "mercury",
+          "venus",
+          "mars",
+          "jupiter",
+          "saturn"
+        ]
+      },
+      "expected": {
+        "normalizedUtc": "1978-11-02T19:45:00+00:00",
+        "julianDay": 2443815.32291667,
+        "bodies": {
+          "sun": {
+            "longitude": 220.035713,
+            "latitude": 0.000138,
+            "speedLongitude": 1.001634,
+            "retrograde": false
+          },
+          "moon": {
+            "longitude": 245.700505,
+            "latitude": 4.822412,
+            "speedLongitude": 14.148556,
+            "retrograde": false
+          },
+          "mercury": {
+            "longitude": 239.304889,
+            "latitude": -2.154749,
+            "speedLongitude": 1.387808,
+            "retrograde": false
+          },
+          "venus": {
+            "longitude": 228.115158,
+            "latitude": -5.711346,
+            "speedLongitude": -0.552282,
+            "retrograde": true
+          },
+          "mars": {
+            "longitude": 240.550937,
+            "latitude": -0.48366,
+            "speedLongitude": 0.718615,
+            "retrograde": false
+          },
+          "jupiter": {
+            "longitude": 128.207817,
+            "latitude": 0.39325,
+            "speedLongitude": 0.072377,
+            "retrograde": false
+          },
+          "saturn": {
+            "longitude": 161.577147,
+            "latitude": 1.608712,
+            "speedLongitude": 0.085276,
+            "retrograde": false
+          }
+        },
+        "angles": {
+          "ascendant": 234.891188,
+          "midheaven": 126.790324
+        },
+        "houseCusps": [
+          234.891188,
+          261.082853,
+          283.472524,
+          306.790324,
+          335.18041,
+          12.370096,
+          54.891188,
+          81.082853,
+          103.472524,
+          126.790324,
+          155.18041,
+          192.370096
+        ],
+        "housesEmpty": false
+      }
+    },
+    {
+      "name": "historical_dst_sensitive_chart",
+      "status": "verified_moshier_reference",
+      "reference": {
+        "source": "pyswisseph Moshier (FLG_MOSEPH)",
+        "note": "CI golden charts use built-in Moshier. Production may use licensed Swiss files (FLG_SWIEPH) with the same fixture schema; regenerate with scripts/generate_golden_charts.py.",
+        "toleranceDegrees": 0.02,
+        "angleToleranceDegrees": 0.05,
+        "sweVersion": 20230604
+      },
+      "input": {
+        "localBirthDate": "1969-07-20",
+        "localBirthTime": "22:17:00",
+        "birthTimeKnown": true,
+        "timezone": "America/New_York",
+        "latitude": 28.3922,
+        "longitude": -80.6077,
+        "houseSystem": "placidus",
+        "zodiacMode": "tropical",
+        "requestedBodies": [
+          "sun",
+          "moon",
+          "mercury",
+          "venus",
+          "mars",
+          "jupiter",
+          "saturn"
+        ]
+      },
+      "expected": {
+        "normalizedUtc": "1969-07-21T02:17:00+00:00",
+        "julianDay": 2440423.59513889,
+        "bodies": {
+          "sun": {
+            "longitude": 118.149418,
+            "latitude": -9.6e-05,
+            "speedLongitude": 0.954669,
+            "retrograde": false
+          },
+          "moon": {
+            "longitude": 191.065591,
+            "latitude": -1.636568,
+            "speedLongitude": 12.806937,
+            "retrograde": false
+          },
+          "mercury": {
+            "longitude": 116.376445,
+            "latitude": 1.481238,
+            "speedLongitude": 2.133378,
+            "retrograde": false
+          },
+          "venus": {
+            "longitude": 75.312743,
+            "latitude": -2.444341,
+            "speedLongitude": 1.101579,
+            "retrograde": false
+          },
+          "mars": {
+            "longitude": 242.81548,
+            "latitude": -3.393447,
+            "speedLongitude": 0.170461,
+            "retrograde": false
+          },
+          "jupiter": {
+            "longitude": 180.782817,
+            "latitude": 1.218441,
+            "speedLongitude": 0.146551,
+            "retrograde": false
+          },
+          "saturn": {
+            "longitude": 38.111172,
+            "latitude": -2.42939,
+            "speedLongitude": 0.052481,
+            "retrograde": false
+          }
+        },
+        "angles": {
+          "ascendant": 335.259057,
+          "midheaven": 253.699244
+        },
+        "houseCusps": [
+          335.259057,
+          15.823219,
+          47.9934,
+          73.699244,
+          97.203693,
+          122.652285,
+          155.259057,
+          195.823219,
+          227.9934,
+          253.699244,
+          277.203693,
+          302.652285
+        ],
+        "housesEmpty": false
+      }
+    },
+    {
+      "name": "unknown_birth_time_chart",
+      "status": "verified_moshier_reference",
+      "reference": {
+        "source": "pyswisseph Moshier (FLG_MOSEPH)",
+        "note": "CI golden charts use built-in Moshier. Production may use licensed Swiss files (FLG_SWIEPH) with the same fixture schema; regenerate with scripts/generate_golden_charts.py.",
+        "toleranceDegrees": 0.05,
+        "angleToleranceDegrees": 0.05,
+        "sweVersion": 20230604
+      },
+      "input": {
+        "localBirthDate": "2000-01-01",
+        "localBirthTime": null,
+        "birthTimeKnown": false,
+        "timezone": "America/Chicago",
+        "latitude": 41.8781,
+        "longitude": -87.6298,
+        "houseSystem": "whole_sign",
+        "zodiacMode": "tropical",
+        "requestedBodies": [
+          "sun",
+          "moon",
+          "mercury",
+          "venus",
+          "mars",
+          "jupiter",
+          "saturn"
+        ]
+      },
+      "expected": {
+        "normalizedUtc": "2000-01-01T18:00:00+00:00",
+        "julianDay": 2451545.25,
+        "bodies": {
+          "sun": {
+            "longitude": 280.623781,
+            "latitude": 0.00023,
+            "speedLongitude": 1.019456,
+            "retrograde": false
+          },
+          "moon": {
+            "longitude": 226.324613,
+            "latitude": 5.119296,
+            "speedLongitude": 11.986064,
+            "retrograde": false
+          },
+          "mercury": {
+            "longitude": 272.278504,
+            "latitude": -1.019101,
+            "speedLongitude": 1.55758,
+            "retrograde": false
+          },
+          "venus": {
+            "longitude": 241.868094,
+            "latitude": 2.059289,
+            "speedLongitude": 1.209323,
+            "retrograde": false
+          },
+          "mars": {
+            "longitude": 328.157233,
+            "latitude": -1.064664,
+            "speedLongitude": 0.77568,
+            "retrograde": false
+          },
+          "jupiter": {
+            "longitude": 25.263326,
+            "latitude": -1.260879,
+            "speedLongitude": 0.041606,
+            "retrograde": false
+          },
+          "saturn": {
+            "longitude": 40.39071,
+            "latitude": -2.443635,
+            "speedLongitude": -0.019487,
+            "retrograde": true
+          }
+        },
+        "angles": null,
+        "houseCusps": null,
+        "housesEmpty": true
+      }
+    }
+  ]
+}

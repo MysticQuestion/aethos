@@ -22,3 +22,6 @@ swiss = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+markers = [
+  "golden: Swiss/Moshier golden chart regression suite",
+]

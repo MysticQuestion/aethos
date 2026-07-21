@@ -13,14 +13,20 @@ jobs:
     defaults:
       run:
         working-directory: services/calculation
+    env:
+      AETHOS_CALC_PROVIDER: swiss
+      AETHOS_SWISS_EPHEMERIS_MODE: moshier
+      AETHOS_ALLOW_DEMO_FALLBACK: "false"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
       - run: python -m pip install --upgrade pip
-      - run: pip install -r requirements.txt
-      - run: pytest
+      - run: pip install -r requirements.txt -r requirements-swiss.txt
+      - run: pytest -v
+      - name: Golden charts (explicit)
+        run: pytest tests/test_golden_charts.py -v
 
   frontend:
     runs-on: ubuntu-latest

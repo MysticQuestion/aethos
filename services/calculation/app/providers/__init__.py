@@ -12,3 +12,8 @@ def get_provider():
         if not settings.allow_demo_fallback:
             return swiss
     return DemoProvider()
+
+
+def reset_provider_cache() -> None:
+    """Clear settings cache so tests can switch provider env vars mid-session."""
+    get_settings.cache_clear()

@@ -6,7 +6,15 @@ from app.calculations.houses import calculate_demo_houses
 from app.calculations.stations import is_retrograde
 from app.calculations.zodiac import decimal_to_zodiac, normalize_longitude
 from app.config import get_settings
-from app.models.astrology import Angles, CalculationMode, CelestialPosition, HouseCusp, HouseSystem, Planet, ProviderMetadata
+from app.models.astrology import (
+    Angles,
+    CalculationMode,
+    CelestialPosition,
+    HouseCusp,
+    HouseSystem,
+    Planet,
+    ProviderMetadata,
+)
 from app.models.requests import NatalChartRequest
 from app.providers.base import CalculationProvider
 
@@ -37,20 +45,35 @@ class SwissEphemerisProvider(CalculationProvider):
     def __init__(self) -> None:
         self._available = False
         self._swisseph = None
+        self._ephe_flag = 0
+        self._ephemeris_source = "unavailable"
         self._status_warning = "pyswisseph is not installed."
         try:
             import swisseph as swe  # type: ignore
 
-            path = get_settings().swiss_ephemeris_path
-            if not path:
-                self._status_warning = "AETHOS_SWISS_EPHEMERIS_PATH is not configured."
-                return
-            if not Path(path).exists():
-                self._status_warning = "Configured ephemeris path does not exist."
-                return
-            swe.set_ephe_path(path)
+            settings = get_settings()
+            mode = (settings.swiss_ephemeris_mode or "moshier").strip().lower()
+            path = settings.swiss_ephemeris_path
+
+            if mode == "files":
+                if not path:
+                    self._status_warning = "AETHOS_SWISS_EPHEMERIS_PATH is not configured for files mode."
+                    return
+                if not Path(path).exists():
+                    self._status_warning = "Configured ephemeris path does not exist."
+                    return
+                swe.set_ephe_path(path)
+                self._ephe_flag = swe.FLG_SWIEPH
+                self._ephemeris_source = "swiss-ephemeris-files"
+            else:
+                # Built-in Moshier: no licensed .se1 files required (CI + local verification).
+                if path and Path(path).exists():
+                    swe.set_ephe_path(path)
+                self._ephe_flag = swe.FLG_MOSEPH
+                self._ephemeris_source = "swiss-moshier"
+
             self._swisseph = swe
-            self.provider_version = getattr(swe, "__version__", "unknown")
+            self.provider_version = str(getattr(swe, "__version__", "unknown"))
             self._available = True
             self._status_warning = ""
         except Exception as exc:
@@ -63,7 +86,12 @@ class SwissEphemerisProvider(CalculationProvider):
             "providerVersion": self.provider_version,
             "calculationMode": self.calculation_mode,
             "ephemerisPathStatus": "configured" if self._available else "unavailable",
-            "warnings": [] if self._available else [self._status_warning],
+            "ephemerisSource": self._ephemeris_source,
+            "warnings": []
+            if self._available
+            else [self._status_warning]
+            if self._status_warning
+            else [],
         }
 
     def planet_position(self, body: Planet, dt: datetime) -> CelestialPosition:
@@ -78,7 +106,7 @@ class SwissEphemerisProvider(CalculationProvider):
             utc.hour + utc.minute / 60 + utc.second / 3600 + utc.microsecond / 3_600_000_000,
         )
         planet_id = getattr(swe, PLANET_TO_SWISS[body])
-        values, _flags = swe.calc_ut(julday, planet_id, swe.FLG_SWIEPH | swe.FLG_SPEED)
+        values, _flags = swe.calc_ut(julday, planet_id, self._ephe_flag | swe.FLG_SPEED)
         longitude, latitude, distance, speed_longitude, speed_latitude, speed_distance = values[:6]
         return CelestialPosition(
             body=body,
@@ -96,7 +124,7 @@ class SwissEphemerisProvider(CalculationProvider):
                 providerId=self.provider_id,
                 providerVersion=self.provider_version,
                 calculationMode=CalculationMode.swiss,
-                ephemerisSource="swiss-ephemeris-server",
+                ephemerisSource=self._ephemeris_source,
                 warnings=[],
             ),
         )
@@ -127,9 +155,11 @@ class SwissEphemerisProvider(CalculationProvider):
             cusps_raw, ascmc = swe.houses(julday, float(request.latitude), float(request.longitude), hsys)
         except Exception as exc:
             cusps, angles, warnings = calculate_demo_houses(seed_longitude, request.houseSystem, True)
-            return cusps, angles, [*warnings, f"Swiss houses failed ({exc.__class__.__name__}); demo house fallback used."]
+            return cusps, angles, [
+                *warnings,
+                f"Swiss houses failed ({exc.__class__.__name__}); demo house fallback used.",
+            ]
 
-        # pyswisseph returns 12 or 13 cusp values depending on version; houses 1-12 are indices 1..12 or 0..11.
         values = list(cusps_raw)
         if len(values) >= 13:
             house_longitudes = values[1:13]
@@ -152,7 +182,7 @@ class SwissEphemerisProvider(CalculationProvider):
             descendant=normalize_longitude(asc + 180),
             ic=normalize_longitude(mc + 180),
         )
-        return cusps, angles, [f"Swiss Ephemeris {request.houseSystem.value} houses."]
+        return cusps, angles, [f"{self._ephemeris_source} {request.houseSystem.value} houses."]
 
 
 def swiss_utc(dt: datetime) -> datetime:

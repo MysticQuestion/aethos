@@ -4,13 +4,18 @@ Aethos is ready for a future server-side Swiss Ephemeris service, but Swiss Ephe
 
 Current calculation-service status:
 
-- Optional adapter: `services/calculation/app/providers/swiss_ephemeris.py`
-- Required Python extra: `pyswisseph`
-- Required env vars:
+- Adapter: `services/calculation/app/providers/swiss_ephemeris.py`
+- Python extra: `pyswisseph` (`requirements-swiss.txt`)
+- Modes:
+  - **moshier** (default): built-in ephemeris, no licensed files — used for golden CI
+  - **files**: licensed Swiss Ephemeris path via `AETHOS_SWISS_EPHEMERIS_PATH`
+- Env vars:
   - `AETHOS_CALC_PROVIDER=swiss`
-  - `AETHOS_SWISS_EPHEMERIS_PATH=/path/to/ephemeris/files`
-  - `AETHOS_ALLOW_DEMO_FALLBACK=false` recommended for production
-- Verified in this phase: demo provider only
+  - `AETHOS_SWISS_EPHEMERIS_MODE=moshier|files`
+  - `AETHOS_SWISS_EPHEMERIS_PATH=/path/to/ephemeris/files` (files mode)
+  - `AETHOS_ALLOW_DEMO_FALLBACK=false` recommended for production / golden tests
+- Golden suite: `tests/fixtures/golden_charts.json` + `tests/test_golden_charts.py`
+- See `docs/CALCULATION_VERIFICATION.md`
 
 Recommended production boundary:
 
