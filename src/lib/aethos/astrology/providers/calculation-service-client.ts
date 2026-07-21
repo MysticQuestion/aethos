@@ -194,3 +194,21 @@ export async function createServiceNatalChart(input: {
 
   return response.json() as Promise<CalculationServiceNatalResponse>;
 }
+
+export async function createServiceAstrocartography(payload: Record<string, unknown>) {
+  const config = getCalculationServiceConfig();
+  if (!config.url) throw new Error("AETHOS_CALCULATION_SERVICE_URL is not configured.");
+
+  const response = await fetch(`${config.url.replace(/\/$/, "")}/v1/astrocartography`, {
+    method: "POST",
+    headers: { "content-type": "application/json", accept: "application/json" },
+    body: JSON.stringify(payload),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error(`Calculation service astrocartography request failed with ${response.status}.`);
+  }
+
+  return response.json();
+}

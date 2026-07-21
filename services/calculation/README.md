@@ -26,6 +26,8 @@ pytest
 - `POST /v1/transits`
 - `POST /v1/events`
 - `POST /v1/timing-primitives`
+- `POST /v1/astrocartography`
+- `POST /v1/relocation-chart`
 
 ## Provider Status
 

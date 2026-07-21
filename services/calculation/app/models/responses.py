@@ -94,3 +94,27 @@ class TimingPrimitivesResponse(BaseModel):
     timingPrimitives: list[TimingPrimitive]
     calculationMetadata: CalculationMetadata
     warnings: list[str]
+
+
+class AstroCartographyLine(BaseModel):
+    lineId: str
+    body: Planet
+    lineType: str  # ASC | DSC | MC | IC
+    geographicLongitude: float = Field(ge=-180, le=180)
+    sampleLatitude: float = Field(ge=-90, le=90)
+    residualOrbDegrees: float = Field(ge=0)
+    methodKey: str
+    notes: list[str] = Field(default_factory=list)
+
+
+class AstrocartographyResponse(BaseModel):
+    normalizedUtc: str
+    lines: list[AstroCartographyLine]
+    withheld: list[str] = Field(default_factory=list)
+    calculationMetadata: CalculationMetadata
+    warnings: list[str]
+    responsibleUseNote: str
+
+
+class RelocationChartResponse(NatalChartResponse):
+    relocationLabel: str | None = None

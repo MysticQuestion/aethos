@@ -16,6 +16,7 @@ Aethos is a serious symbolic intelligence platform for self-knowledge, timing aw
 - `/engine` inspectable vector/reconciliation engine view
 - `/methodology` responsible methodology and interpretive limits
 - `/decision-lens` I Ching Decision Lens (ephemeral cast, journal archive)
+- `/astrocartography` planetary ASC/DSC/MC/IC lines (scaffold)
 - `/account` optional Supabase auth + push/pull sync
 - `/settings` storage mode, privacy posture, and local data controls
 - `/privacy` data export/delete posture and sensitive-data notices
@@ -43,6 +44,7 @@ docker compose up
 - Supabase Auth + migrations: `docs/SUPABASE_SETUP.md`
 - Deploy (Vercel + calc + Swiss): `docs/DEPLOYMENT.md`
 - Multi-system vision: `docs/MULTI_SYSTEM_VISION.md`
+- Astrocartography: `docs/ASTROCARTOGRAPHY.md`
 
 ## Verification
 

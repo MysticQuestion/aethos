@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from app.api.astrocartography import router as astrocartography_router
 from app.api.events import router as events_router
 from app.api.health import router as health_router
 from app.api.natal import router as natal_router
@@ -17,6 +18,7 @@ app.include_router(health_router)
 app.include_router(natal_router)
 app.include_router(transits_router)
 app.include_router(events_router)
+app.include_router(astrocartography_router)
 
 
 @app.exception_handler(Exception)
