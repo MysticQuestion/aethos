@@ -44,6 +44,10 @@ Same body as natal chart with **relocated** lat/lon/timezone. Returns chart + `r
 
 - Route: `/astrocartography`  
 - API proxy: `POST /api/aethos/astrocartography`  
+- Relocation pair: `POST /api/aethos/relocation`  
+- SVG equirectangular **map view** (line meridians + birth/reloc pins)  
+- **Natal vs relocation** side-by-side houses/bodies  
+- **Export PDF** via print pipeline (`src/lib/aethos/pdf/print-export.ts`)  
 - Local demo works without the Python service (server-side demo path via calc service when configured).
 
 ## Run

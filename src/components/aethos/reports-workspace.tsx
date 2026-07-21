@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Download, FileText } from "lucide-react";
+import { Copy, Download, FileText, Printer } from "lucide-react";
 import { EmptyState } from "./empty-state";
 import { REPORT_TYPES } from "@/lib/aethos/constants";
 import { createSampleAethosProfile } from "@/lib/aethos/profile";
 import { generateAethosReport } from "@/lib/aethos/reports";
 import { loadLocalAethosState, saveLocalAethosState } from "@/lib/aethos/storage";
+import { exportMarkdownReportAsPdf } from "@/lib/aethos/pdf/print-export";
 import type { AethosReport, ReportType } from "@/lib/aethos/types";
 
 export function ReportsWorkspace() {
@@ -46,6 +47,15 @@ export function ReportsWorkspace() {
     URL.revokeObjectURL(url);
   }
 
+  function exportPdf() {
+    if (!activeReport) return;
+    exportMarkdownReportAsPdf({
+      title: activeReport.title,
+      subtitle: `Generated ${new Date(activeReport.generatedAt).toLocaleString()}`,
+      markdown: activeReport.markdown
+    });
+  }
+
   return (
     <section className="grid gap-5 xl:grid-cols-[1fr_460px]">
       <div className="grid gap-4 md:grid-cols-2">
@@ -74,7 +84,11 @@ export function ReportsWorkspace() {
               </button>
               <button type="button" onClick={downloadJson} className="inline-flex min-h-9 items-center gap-2 rounded-md border border-[var(--line)] px-3 text-xs font-semibold">
                 <Download className="h-3.5 w-3.5" aria-hidden="true" />
-                Download
+                JSON
+              </button>
+              <button type="button" onClick={exportPdf} className="inline-flex min-h-9 items-center gap-2 rounded-md border border-[var(--line)] px-3 text-xs font-semibold">
+                <Printer className="h-3.5 w-3.5" aria-hidden="true" />
+                PDF
               </button>
             </div>
           ) : null}

@@ -8,7 +8,7 @@ export default function ReportsPage() {
     <SiteShell
       eyebrow="Structured reports"
       title="Generate clean report previews from profile, timing, and journal data."
-      description="Reports are deterministic Markdown/HTML-ready outputs. PDF export remains a deferred scaffold until the rendering pipeline is production-tested."
+      description="Reports are deterministic Markdown outputs with print-to-PDF export (browser Save as PDF), plus JSON download for practitioners."
     >
       <ReportsWorkspace />
       <ResponsibleUseNote compact />
