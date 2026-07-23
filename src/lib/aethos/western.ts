@@ -35,7 +35,12 @@ export function calculateWesternBaseline(intake: AethosBirthIntake): WesternBase
   const restrictedOutputs = getRestrictedOutputs(intake);
   const canCalculateTimeSensitive =
     restrictedOutputs.length === 0 &&
-    Boolean(intake.birthTime && intake.birthPlace?.latitude && intake.birthPlace.longitude && intake.birthPlace.timezone);
+    Boolean(
+      intake.birthTime &&
+      intake.birthPlace?.latitude !== undefined &&
+      intake.birthPlace.longitude !== undefined &&
+      intake.birthPlace.timezone
+    );
 
   const sunSign = getSunSign(intake.birthDate);
 

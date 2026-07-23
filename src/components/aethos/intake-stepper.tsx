@@ -1,22 +1,32 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { USER_INTENTIONS, SYMBOLIC_SYSTEMS } from "@/lib/aethos/constants";
-import { demoIntake } from "@/lib/aethos/demo";
 import { generateAethosProfile } from "@/lib/aethos/profile";
-import { emptyAethosState, loadLocalAethosState, saveLocalAethosState } from "@/lib/aethos/storage";
-import { mirrorProfileToCloud } from "@/lib/aethos/storage/storage-router";
+import { useActiveProfile } from "@/components/aethos/active-profile-provider";
 import type { AethosBirthIntake, UserIntention } from "@/lib/aethos/types";
+import type { NatalChart } from "@/lib/aethos/astrology/types";
 
 const steps = ["Identity", "Birth data", "Focus", "Review"];
+const SYSTEM_KEY_MAP = {
+  western_astrology: "westernAstrology",
+  numerology: "numerology",
+  vedic_astrology: "vedicAstrology",
+  human_design: "humanDesign",
+  bazi: "bazi",
+  i_ching: "iChing"
+} as const;
 
 export function IntakeStepper() {
+  const router = useRouter();
+  const { saveActiveProfile } = useActiveProfile();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<AethosBirthIntake>({
-    ...demoIntake,
     displayName: "",
-    birthDate: "1992-04-18",
+    birthDate: "",
+    birthTimeConfidence: "unknown",
     fullBirthName: "",
     primaryIntention: "self_understanding",
     systemsEnabled: {
@@ -26,14 +36,66 @@ export function IntakeStepper() {
       humanDesign: true,
       bazi: false,
       iChing: false
+    },
+    consent: {
+      nonDeterministicDisclaimerAccepted: false,
+      aiReflectionAllowed: false,
+      journalAnalysisAllowed: false,
+      practitionerSharingAllowed: false
     }
   });
   const [saved, setSaved] = useState(false);
   const [syncNote, setSyncNote] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const progress = useMemo(() => ((step + 1) / steps.length) * 100, [step]);
 
+  function systemIsEnabled(value: string) {
+    if (value === "journaling") return form.consent.journalAnalysisAllowed;
+    const key = SYSTEM_KEY_MAP[value as keyof typeof SYSTEM_KEY_MAP];
+    return key ? form.systemsEnabled[key] : false;
+  }
+
+  function toggleSystem(value: string) {
+    if (value === "journaling") {
+      setForm({ ...form, consent: { ...form.consent, journalAnalysisAllowed: !form.consent.journalAnalysisAllowed } });
+      return;
+    }
+    const key = SYSTEM_KEY_MAP[value as keyof typeof SYSTEM_KEY_MAP];
+    if (key) setForm({ ...form, systemsEnabled: { ...form.systemsEnabled, [key]: !form.systemsEnabled[key] } });
+  }
+
   async function saveProfile() {
+    if (!form.displayName.trim() || !form.birthDate || !form.consent.nonDeterministicDisclaimerAccepted) return;
+    setSaving(true);
+    setSyncNote(null);
+    let natalChart: NatalChart | undefined;
+    try {
+      const birthPlace = form.birthPlace;
+      const response = await fetch("/api/aethos/chart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          birthDate: form.birthDate,
+          birthTime: form.birthTime || undefined,
+          birthTimeKnown: form.birthTimeConfidence === "exact" && Boolean(form.birthTime),
+          birthLocationLabel: birthPlace ? [birthPlace.city, birthPlace.region, birthPlace.country].filter(Boolean).join(", ") : undefined,
+          latitude: birthPlace?.latitude,
+          longitude: birthPlace?.longitude,
+          timezone: birthPlace?.timezone,
+          houseSystem: "whole_sign",
+          zodiacMode: "tropical",
+          calculationMode: "demo"
+        })
+      });
+      if (!response.ok) throw new Error("Chart calculation failed");
+      natalChart = (await response.json()).natalChart as NatalChart;
+    } catch {
+      setSyncNote("The profile could not be calculated. Review the birth details and try again.");
+      setSaving(false);
+      return;
+    }
+
     const profile = generateAethosProfile(
       {
         ...form,
@@ -42,23 +104,11 @@ export function IntakeStepper() {
       },
       false
     );
-    const previous = typeof window === "undefined" ? emptyAethosState() : loadLocalAethosState();
-    saveLocalAethosState({
-      ...previous,
-      profile,
-      updatedAt: new Date().toISOString()
-    });
+    const result = await saveActiveProfile(profile, natalChart);
     setSaved(true);
-    try {
-      const mirror = await mirrorProfileToCloud(profile);
-      setSyncNote(
-        mirror.mirrored
-          ? "Also mirrored to Supabase for your signed-in account."
-          : "Saved locally. Cloud mirror skipped (sign in on Account when ready)."
-      );
-    } catch {
-      setSyncNote("Saved locally. Cloud mirror failed — check Account / Supabase status.");
-    }
+    setSaving(false);
+    setSyncNote(result.note);
+    window.setTimeout(() => router.push("/dashboard"), 700);
   }
 
   return (
@@ -129,6 +179,10 @@ export function IntakeStepper() {
                 <option value="unknown">Unknown time</option>
               </select>
             </label>
+            {form.birthTimeConfidence !== "unknown" ? <label className="grid gap-2 text-sm">
+              Birth time
+              <input type="time" required className="min-h-11 rounded-md border border-[var(--line)] bg-[rgba(255,255,255,0.04)] px-3 outline-none" value={form.birthTime ?? ""} onChange={(event) => setForm({ ...form, birthTime: event.target.value })} />
+            </label> : null}
             <label className="grid gap-2 text-sm">
               Birth city
               <input
@@ -143,6 +197,10 @@ export function IntakeStepper() {
               />
             </label>
             <label className="grid gap-2 text-sm">
+              Birth region / state
+              <input className="min-h-11 rounded-md border border-[var(--line)] bg-[rgba(255,255,255,0.04)] px-3 outline-none" value={form.birthPlace?.region ?? ""} onChange={(event) => setForm({ ...form, birthPlace: { city: form.birthPlace?.city ?? "", region: event.target.value, country: form.birthPlace?.country ?? "" } })} />
+            </label>
+            <label className="grid gap-2 text-sm">
               Birth country
               <input
                 className="min-h-11 rounded-md border border-[var(--line)] bg-[rgba(255,255,255,0.04)] px-3 outline-none"
@@ -155,6 +213,9 @@ export function IntakeStepper() {
                 }
               />
             </label>
+            <label className="grid gap-2 text-sm">Birth timezone (IANA)<input placeholder="America/Los_Angeles" className="min-h-11 rounded-md border border-[var(--line)] bg-[rgba(255,255,255,0.04)] px-3 outline-none" value={form.birthPlace?.timezone ?? ""} onChange={(event) => setForm({ ...form, birthPlace: { city: form.birthPlace?.city ?? "", region: form.birthPlace?.region, country: form.birthPlace?.country ?? "", timezone: event.target.value } })} /></label>
+            <label className="grid gap-2 text-sm">Latitude<input type="number" step="any" min="-90" max="90" className="min-h-11 rounded-md border border-[var(--line)] bg-[rgba(255,255,255,0.04)] px-3 outline-none" value={form.birthPlace?.latitude ?? ""} onChange={(event) => setForm({ ...form, birthPlace: { city: form.birthPlace?.city ?? "", region: form.birthPlace?.region, country: form.birthPlace?.country ?? "", timezone: form.birthPlace?.timezone, latitude: event.target.value === "" ? undefined : Number(event.target.value), longitude: form.birthPlace?.longitude } })} /></label>
+            <label className="grid gap-2 text-sm">Longitude<input type="number" step="any" min="-180" max="180" className="min-h-11 rounded-md border border-[var(--line)] bg-[rgba(255,255,255,0.04)] px-3 outline-none" value={form.birthPlace?.longitude ?? ""} onChange={(event) => setForm({ ...form, birthPlace: { city: form.birthPlace?.city ?? "", region: form.birthPlace?.region, country: form.birthPlace?.country ?? "", timezone: form.birthPlace?.timezone, latitude: form.birthPlace?.latitude, longitude: event.target.value === "" ? undefined : Number(event.target.value) } })} /></label>
           </div>
         ) : null}
 
@@ -182,12 +243,12 @@ export function IntakeStepper() {
               <p className="text-sm font-semibold">Preferred systems</p>
               <div className="mt-3 grid gap-2">
                 {SYMBOLIC_SYSTEMS.map((system) => (
-                  <div key={system.value} className="rounded-md border border-[var(--line)] p-3 text-sm">
+                  <button key={system.value} type="button" aria-pressed={systemIsEnabled(system.value)} onClick={() => toggleSystem(system.value)} className={`rounded-md border p-3 text-left text-sm ${systemIsEnabled(system.value) ? "border-[var(--ochre)] bg-[rgba(217,180,95,0.1)]" : "border-[var(--line)]"}`}>
                     <div className="flex items-center justify-between gap-3">
                       <span className="font-semibold">{system.label}</span>
                       <span className="text-xs text-[var(--ink-soft)]">{system.status.replace("_", " ")}</span>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
@@ -200,6 +261,11 @@ export function IntakeStepper() {
             <p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">
               Aethos will save a usable local profile, with unknown birth-time restrictions applied automatically.
             </p>
+            <div className="mt-5 grid gap-3">
+              <label className="flex items-start gap-3 text-sm leading-6"><input type="checkbox" className="mt-1" checked={form.consent.nonDeterministicDisclaimerAccepted} onChange={(event) => setForm({ ...form, consent: { ...form.consent, nonDeterministicDisclaimerAccepted: event.target.checked } })} /><span><strong>Required:</strong> I understand Aethos provides symbolic interpretation and reflection—not deterministic, medical, legal, or financial advice.</span></label>
+              <label className="flex items-start gap-3 text-sm leading-6"><input type="checkbox" className="mt-1" checked={form.consent.aiReflectionAllowed} onChange={(event) => setForm({ ...form, consent: { ...form.consent, aiReflectionAllowed: event.target.checked } })} /><span>Allow AI-assisted reflective synthesis for this profile.</span></label>
+              <label className="flex items-start gap-3 text-sm leading-6"><input type="checkbox" className="mt-1" checked={form.consent.journalAnalysisAllowed} onChange={(event) => setForm({ ...form, consent: { ...form.consent, journalAnalysisAllowed: event.target.checked } })} /><span>Allow journal entries to inform pattern analysis.</span></label>
+            </div>
             {saved ? (
               <div className="mt-4 grid gap-2">
                 <p className="flex items-center gap-2 text-sm font-semibold text-[var(--teal)]">
@@ -234,9 +300,10 @@ export function IntakeStepper() {
           <button
             type="button"
             onClick={saveProfile}
-            className="min-h-10 rounded-md bg-[var(--ochre)] px-4 text-sm font-semibold text-[#090a12]"
+            disabled={saving || !form.displayName.trim() || !form.birthDate || !form.consent.nonDeterministicDisclaimerAccepted || (form.birthTimeConfidence !== "unknown" && !form.birthTime)}
+            className="min-h-10 rounded-md bg-[var(--ochre)] px-4 text-sm font-semibold text-[#090a12] disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Create Local Profile
+            {saving ? "Calculating and saving…" : "Create Active Profile"}
           </button>
         )}
       </div>

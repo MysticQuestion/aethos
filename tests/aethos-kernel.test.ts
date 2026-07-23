@@ -8,6 +8,7 @@ import { generateAethosReport } from "@/lib/aethos/reports";
 import { classifyReconciliation, reconcileVectors } from "@/lib/aethos/reconciliation";
 import { getStorageMode } from "@/lib/aethos/storage";
 import { generateTimingWindows } from "@/lib/aethos/timing";
+import { calculateWesternBaseline } from "@/lib/aethos/western";
 import type { SymbolicVector } from "@/lib/aethos/types";
 
 describe("Aethos Phase 1 kernel", () => {
@@ -65,6 +66,24 @@ describe("Aethos Phase 1 kernel", () => {
     expect(kernel.insights.length).toBeGreaterThan(0);
     expect(kernel.insights[0].engineDrawer.generatedFrom).toBe("structured_vectors");
     expect(kernel.western.metadata.restrictedOutputs).toContain("Ascendant");
+  });
+
+  it("accepts valid zero-degree coordinates as complete location data", () => {
+    const western = calculateWesternBaseline({
+      ...demoIntake,
+      birthTime: "12:00",
+      birthTimeConfidence: "exact",
+      birthPlace: {
+        city: "Null Island reference",
+        country: "Reference",
+        latitude: 0,
+        longitude: 0,
+        timezone: "Etc/UTC"
+      }
+    });
+
+    expect(western.housesStatus).toBe("available");
+    expect(western.metadata.inputCompleteness).toBe("complete");
   });
 
   it("generates a structured sample profile and timing windows", () => {

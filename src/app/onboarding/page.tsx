@@ -1,52 +1,34 @@
-import { CircleDashed } from "lucide-react";
+import { CheckCircle2, ShieldCheck } from "lucide-react";
 import { IntakeStepper } from "@/components/aethos/intake-stepper";
 import { ResponsibleUseNote } from "@/components/aethos/responsible-use-note";
 import { SiteShell } from "@/components/site-shell";
-import { StatusBadge } from "@/components/status-badge";
-import { demoIntake } from "@/lib/aethos/demo";
 
-const fields = [
-  ["Display name", demoIntake.displayName],
-  ["Birth date", demoIntake.birthDate],
-  ["Birth time confidence", demoIntake.birthTimeConfidence],
-  ["Birth place", `${demoIntake.birthPlace?.city}, ${demoIntake.birthPlace?.region ?? ""}`],
-  ["Full birth name", demoIntake.fullBirthName ?? "Not provided"]
+const readiness = [
+  "Birth time is never silently replaced with noon for time-sensitive claims.",
+  "Coordinates and timezone are retained with the canonical intake when provided.",
+  "System preferences are explicit and can be revised later.",
+  "Responsible-use consent starts unaccepted and requires an affirmative choice.",
+  "Calculation metadata is stored alongside the active profile."
 ];
 
 export default function OnboardingPage() {
   return (
     <SiteShell
       eyebrow="Canonical intake"
-      title="Create a profile that stays useful even when birth data is incomplete."
-      description="Onboarding collects identity, birth context, intention, preferred systems, and consent. Unknown birth time lowers confidence instead of forcing fabricated defaults."
+      title="Create the profile that powers your entire Aethos workspace."
+      description="Your intake is calculated, saved locally first, optionally mirrored to your authenticated cloud account, and then used by the dashboard and profile experience."
     >
       <section className="grid gap-5 xl:grid-cols-[1fr_420px]">
         <IntakeStepper />
-        <div className="grid gap-5">
+        <aside className="grid h-fit gap-5">
           <div className="aethos-panel rounded-md p-5">
-          <h2 className="text-lg font-semibold">Demo intake record</h2>
-          <div className="mt-5 grid gap-3">
-            {fields.map(([label, value]) => (
-              <div key={label} className="grid gap-2 rounded-md border border-[var(--line)] p-4 sm:grid-cols-[180px_1fr]">
-                <p className="text-sm font-semibold text-[var(--ink-soft)]">{label}</p>
-                <p className="text-sm text-[var(--foreground)]">{value}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-          <div className="aethos-panel rounded-md p-5">
-            <h2 className="text-lg font-semibold">Systems enabled</h2>
+            <div className="flex items-center gap-3"><ShieldCheck className="h-5 w-5 text-[var(--teal)]" aria-hidden="true" /><h2 className="text-lg font-semibold">Data integrity boundary</h2></div>
             <div className="mt-5 grid gap-3">
-              {Object.entries(demoIntake.systemsEnabled).map(([system, enabled]) => (
-                <div key={system} className="flex items-center justify-between gap-3">
-                  <span className="text-sm text-[var(--ink-soft)]">{system}</span>
-                  {enabled ? <StatusBadge tone="agreement">enabled</StatusBadge> : <CircleDashed className="h-5 w-5 text-[var(--ink-soft)]" />}
-                </div>
-              ))}
+              {readiness.map((item) => <div key={item} className="flex items-start gap-3 rounded-md border border-[var(--line)] p-4"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--teal)]" aria-hidden="true" /><p className="text-sm leading-6 text-[var(--ink-soft)]">{item}</p></div>)}
             </div>
           </div>
           <ResponsibleUseNote compact />
-        </div>
+        </aside>
       </section>
     </SiteShell>
   );
