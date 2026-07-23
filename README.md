@@ -45,6 +45,11 @@ docker compose up
 - Deploy (Vercel + calc + Swiss): `docs/DEPLOYMENT.md`
 - Multi-system vision: `docs/MULTI_SYSTEM_VISION.md`
 - Astrocartography: `docs/ASTROCARTOGRAPHY.md`
+- Vercel Connect + Supabase MCP: `docs/VERCEL_CONNECT_SUPABASE.md`
+
+```bash
+npm run check:supabase   # env wiring readiness (no secrets printed)
+```
 
 ## Verification
 

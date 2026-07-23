@@ -2,6 +2,14 @@
 
 Connect project **https://github.com/MysticQuestion/aethos** to a Supabase project.
 
+Also see:
+
+- `docs/VERCEL_CONNECT_SUPABASE.md` — Vercel Connect / `fuchsia-bridge` / MCP ops tokens  
+- `scripts/check-supabase-wiring.mjs` — local env readiness check  
+- `scripts/apply-migrations-checklist.md` — migration order  
+
+Quick status while the app is running: `GET /api/ops/supabase-status`
+
 ## 1. Create the project
 
 1. Open [Supabase Dashboard](https://supabase.com/dashboard) → New project.
