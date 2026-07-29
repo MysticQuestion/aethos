@@ -16,6 +16,7 @@ import {
   UserRound
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ViewLayerToggle } from "@/components/aethos/view-layer-toggle";
 
 const navItems = [
   { href: "/", label: "Home", icon: Home },
@@ -111,7 +112,10 @@ export function SiteShell({
               </h1>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--ink-soft)] sm:text-base">{description}</p>
             </div>
-            {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
+            <div className="flex flex-wrap items-center gap-2">
+              <ViewLayerToggle />
+              {actions}
+            </div>
           </header>
           {children}
         </div>

@@ -14,10 +14,10 @@ export function runEnabledEngines(intake: AethosBirthIntake): EngineLayerResult[
   const results: EngineLayerResult[] = [];
   const sys = intake.systemsEnabled;
 
+  // Permanent natal profiles only include systems whose current behavior is
+  // defensible at the supplied input resolution. Research calculators remain
+  // directly available to lab surfaces, but cannot contribute natal vectors.
   if (sys.humanDesign) results.push(calculateHumanDesign(intake));
-  if (sys.vedicAstrology) results.push(calculateVedicBaseline(intake));
-  if (sys.bazi) results.push(calculateBazi(intake));
-  if (sys.iChing) results.push(calculateIChing(intake));
 
   return results;
 }

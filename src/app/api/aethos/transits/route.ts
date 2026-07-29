@@ -3,6 +3,11 @@ import { z } from "zod";
 import { jsonError } from "@/lib/api";
 import { createNatalChart } from "@/lib/aethos/astrology/natal";
 import { generateTransitEvents } from "@/lib/aethos/astrology/transits";
+import {
+  createServiceTransits,
+  getCalculationServiceConfig,
+  normalizeServiceTransits
+} from "@/lib/aethos/astrology/providers/calculation-service-client";
 
 const natalChartInputSchema = z.object({
   birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -37,6 +42,22 @@ export async function POST(request: Request) {
       zodiacMode: "tropical",
       calculationMode: "demo"
     }));
+    const serviceConfig = getCalculationServiceConfig();
+    if (serviceConfig.url) {
+      try {
+        const serviceResult = await createServiceTransits(natalChart, input.dateRangeStart, input.dateRangeEnd);
+        const transitEvents = normalizeServiceTransits(serviceResult);
+        return NextResponse.json({
+          transitEvents,
+          retrogradeEvents: [],
+          calculationMetadata: serviceResult.calculationMetadata,
+          warnings: serviceResult.warnings,
+          providerRoute: "calculation_service"
+        });
+      } catch (error) {
+        if (!serviceConfig.allowDemoFallback) throw error;
+      }
+    }
     const result = await generateTransitEvents(natalChart, {
       startDate: input.dateRangeStart,
       endDate: input.dateRangeEnd
@@ -47,7 +68,8 @@ export async function POST(request: Request) {
       calculationMetadata: result.transitEvents[0]?.metadata ?? natalChart.metadata,
       warnings: [
         "Demo transit events are deterministic samples and not astronomical Swiss Ephemeris calculations."
-      ]
+      ],
+      providerRoute: "next_demo_fallback"
     });
   } catch (error) {
     return jsonError(error);

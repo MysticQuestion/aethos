@@ -57,7 +57,10 @@ export function generateTimingWindows(transitEvents: TransitEvent[]): AstroTimin
   const endDate = transitEvents.map((event) => event.endsAt).sort().at(-1) ?? transitEvents[0].endsAt;
   const peakDate = sortedDates[Math.floor(sortedDates.length / 2)];
   const intensityScore = calculateWindowIntensity(transitEvents);
-  const confidenceScore = calculateConfidenceScore(transitEvents, true);
+  const confidenceScore = calculateConfidenceScore(
+    transitEvents,
+    transitEvents.some((event) => event.metadata.calculationMode === "demo")
+  );
   const metadataSource = transitEvents[0]?.metadata;
   const calculationMetadata: CalculationMetadataV2 =
     metadataSource ??

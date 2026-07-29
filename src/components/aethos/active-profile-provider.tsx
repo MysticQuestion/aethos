@@ -2,7 +2,8 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { AethosProfile, AethosReport, JournalEntry } from "@/lib/aethos/types";
-import type { NatalChart } from "@/lib/aethos/astrology/types";
+import type { AstroTimingWindow, NatalChart, TransitEvent } from "@/lib/aethos/astrology/types";
+import { generateTimingWindows } from "@/lib/aethos/astrology/timing-windows";
 import { emptyAethosState } from "@/lib/aethos/storage";
 import { loadExtendedLocalState, saveExtendedLocalState, type ExtendedAethosState } from "@/lib/aethos/storage/local-store";
 import { getBrowserSessionUser } from "@/lib/aethos/storage/supabase-store";
@@ -16,10 +17,15 @@ type ActiveProfileContextValue = {
   natalChart?: NatalChart;
   journalEntries: JournalEntry[];
   reports: AethosReport[];
+  transitEvents: TransitEvent[];
+  timingWindows: AstroTimingWindow[];
+  timingStatus: "idle" | "loading" | "ready" | "empty" | "error";
+  timingNote?: string;
   status: ActiveProfileStatus;
   source: ActiveProfileSource;
   syncNote?: string;
   refresh: () => Promise<void>;
+  refreshTiming: () => Promise<void>;
   saveActiveProfile: (profile: AethosProfile, natalChart?: NatalChart) => Promise<{ mirrored: boolean; note: string }>;
 };
 
@@ -30,6 +36,8 @@ export function ActiveProfileProvider({ children }: { children: React.ReactNode 
   const [status, setStatus] = useState<ActiveProfileStatus>("loading");
   const [source, setSource] = useState<ActiveProfileSource>(null);
   const [syncNote, setSyncNote] = useState<string>();
+  const [timingStatus, setTimingStatus] = useState<ActiveProfileContextValue["timingStatus"]>("idle");
+  const [timingNote, setTimingNote] = useState<string>();
 
   const loadLocal = useCallback(() => {
     const local = loadExtendedLocalState();
@@ -73,11 +81,22 @@ export function ActiveProfileProvider({ children }: { children: React.ReactNode 
 
   const saveActiveProfile = useCallback(async (profile: AethosProfile, natalChart?: NatalChart) => {
     const previous = loadExtendedLocalState();
-    const next = { ...previous, profile, natalChart: natalChart ?? previous.natalChart };
+    const chartChanged = Boolean(natalChart && natalChart.id !== previous.natalChart?.id);
+    const next = {
+      ...previous,
+      profile,
+      natalChart: natalChart ?? previous.natalChart,
+      transitEvents: chartChanged ? [] : previous.transitEvents,
+      timingWindows: chartChanged ? [] : previous.timingWindows
+    };
     saveExtendedLocalState(next);
     setState(next);
     setSource("local");
     setStatus("ready");
+    if (chartChanged) {
+      setTimingStatus("idle");
+      setTimingNote(undefined);
+    }
 
     try {
       const mirror = await mirrorProfileToCloud(profile);
@@ -93,17 +112,66 @@ export function ActiveProfileProvider({ children }: { children: React.ReactNode 
     }
   }, []);
 
+  const refreshTiming = useCallback(async () => {
+    const current = loadExtendedLocalState();
+    if (!current.natalChart) {
+      setTimingStatus("empty");
+      setTimingNote("A saved natal chart is required before timing events can be calculated.");
+      return;
+    }
+    setTimingStatus("loading");
+    try {
+      const start = new Date();
+      const end = new Date(start);
+      end.setUTCDate(end.getUTCDate() + 60);
+      const response = await fetch("/api/aethos/transits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          natalChart: current.natalChart,
+          dateRangeStart: start.toISOString(),
+          dateRangeEnd: end.toISOString(),
+          providerMode: current.natalChart.metadata.calculationMode
+        })
+      });
+      if (!response.ok) throw new Error("Timing service request failed.");
+      const result = await response.json() as {
+        transitEvents: TransitEvent[];
+        warnings?: string[];
+        providerRoute?: string;
+      };
+      const timingWindows = generateTimingWindows(result.transitEvents);
+      const next = { ...current, transitEvents: result.transitEvents, timingWindows };
+      saveExtendedLocalState(next);
+      setState(next);
+      setTimingStatus(timingWindows.length ? "ready" : "empty");
+      setTimingNote(
+        timingWindows.length
+          ? `${result.providerRoute === "calculation_service" ? "Calculation-service" : "Demo-provider"} events refreshed for the next 60 days.`
+          : "No supported transit aspects were detected in the next 60 days."
+      );
+    } catch {
+      setTimingStatus("error");
+      setTimingNote("Timing events could not be refreshed. The saved natal profile remains available.");
+    }
+  }, []);
+
   const value = useMemo<ActiveProfileContextValue>(() => ({
     profile: state.profile,
     natalChart: state.natalChart,
     journalEntries: state.journalEntries,
     reports: state.reports,
+    transitEvents: state.transitEvents ?? [],
+    timingWindows: state.timingWindows ?? [],
+    timingStatus,
+    timingNote,
     status,
     source,
     syncNote,
     refresh,
+    refreshTiming,
     saveActiveProfile
-  }), [refresh, saveActiveProfile, source, state, status, syncNote]);
+  }), [refresh, refreshTiming, saveActiveProfile, source, state, status, syncNote, timingNote, timingStatus]);
 
   return <ActiveProfileContext.Provider value={value}>{children}</ActiveProfileContext.Provider>;
 }
