@@ -26,3 +26,6 @@ pythonpath = ["."]
 markers = [
   "golden: Swiss/Moshier golden chart regression suite",
 ]
+
+[tool.vercel]
+entrypoint = "app.main:app"
