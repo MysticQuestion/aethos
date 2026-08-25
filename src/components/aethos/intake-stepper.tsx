@@ -248,6 +248,7 @@ export function IntakeStepper() {
                       <span className="font-semibold">{system.label}</span>
                       <span className="text-xs text-[var(--ink-soft)]">{system.status.replace("_", " ")}</span>
                     </div>
+                    {system.status === "research_preview" ? <span className="mt-2 block text-xs leading-5 text-[var(--ink-soft)]">Preference recorded; this research system will not contribute permanent natal claims.</span> : null}
                   </button>
                 ))}
               </div>

@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from app.providers import reset_provider_cache
+from app.providers import get_provider, reset_provider_cache
 
 
 @pytest.fixture()
@@ -83,6 +83,9 @@ def test_swiss_astrocartography_if_available(client, acg_payload):
     os.environ["AETHOS_ALLOW_DEMO_FALLBACK"] = "false"
     reset_provider_cache()
     try:
+        status = get_provider().status()
+        if status.get("status") != "available" or status.get("calculationMode") != "swiss":
+            pytest.skip(f"Swiss path unavailable: {status}")
         response = client.post("/v1/astrocartography", json=acg_payload)
         if response.status_code != 200:
             pytest.skip("Swiss path unavailable")

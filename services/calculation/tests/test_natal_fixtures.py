@@ -1,10 +1,14 @@
-def test_natal_endpoint_returns_demo_chart(client, natal_payload):
+import os
+
+
+def test_natal_endpoint_returns_configured_chart(client, natal_payload):
     response = client.post("/v1/natal-chart", json=natal_payload)
     assert response.status_code == 200
     body = response.json()
     assert body["normalizedUtc"].endswith("+00:00")
     assert len(body["planetaryPositions"]) == len(natal_payload["requestedBodies"])
-    assert body["calculationMetadata"]["calculationMode"] == "demo"
+    expected_mode = "swiss" if os.getenv("AETHOS_CALC_PROVIDER") == "swiss" else "demo"
+    assert body["calculationMetadata"]["calculationMode"] == expected_mode
     assert body["houses"]
 
 

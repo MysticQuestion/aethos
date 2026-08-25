@@ -6,18 +6,16 @@ import { InsightCard } from "@/components/insight-card";
 import { MetricCard } from "@/components/metric-card";
 import { SiteShell } from "@/components/site-shell";
 import { StatusBadge } from "@/components/status-badge";
-import { TimingWindowCard } from "@/components/aethos/timing-window-card";
+import { ActiveTimingPanel } from "@/components/aethos/active-timing-panel";
 import { ResponsibleUseNote } from "@/components/aethos/responsible-use-note";
 import { ResponsibleUseBoundary } from "@/components/aethos/responsible-use-boundary";
 import { EmptyState } from "@/components/aethos/empty-state";
 import { useActiveProfile } from "@/components/aethos/active-profile-provider";
 import { buildDemoKernel } from "@/lib/aethos/demo";
-import { generateTimingWindows } from "@/lib/aethos/timing";
 
 export default function DashboardPage() {
   const { profile, natalChart, journalEntries, reports, source, status, syncNote } = useActiveProfile();
   const kernel = profile ? buildDemoKernel(profile.intake) : null;
-  const timingWindows = profile ? generateTimingWindows(profile) : [];
 
   return (
     <SiteShell
@@ -54,8 +52,8 @@ export default function DashboardPage() {
         </section>
         {kernel.lowConfidenceMode ? <section className="rounded-md border border-[rgba(214,106,154,0.3)] bg-[rgba(214,106,154,0.08)] p-5"><p className="text-sm font-semibold text-[var(--wine)]">Data calibration: birth time incomplete.</p><p className="mt-2 text-sm leading-6 text-[var(--ink-soft)]">Ascendant, houses, Human Design Type, astrocartography, Vedic Lagna, and BaZi Hour Pillar remain restricted to prevent false precision.</p></section> : null}
         <section className="grid gap-5 xl:grid-cols-[1fr_360px]">
-          <div className="grid gap-5">{kernel.insights.slice(0, 3).map((insight) => <InsightCard key={insight.id} insight={insight} />)}</div>
-          <aside className="grid h-fit gap-5">{timingWindows.slice(0, 2).map((window) => <TimingWindowCard key={window.id} window={window} />)}<div className="aethos-panel rounded-md p-5"><p className="text-sm font-semibold">Next recommended reflection</p><p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">What would make this interpretation more grounded in lived experience before it becomes a decision input?</p><div className="mt-4"><StatusBadge tone="mixed">reflection</StatusBadge></div></div></aside>
+          <div className="grid gap-5">{kernel.insights.map((insight) => <InsightCard key={insight.id} insight={insight} />)}</div>
+          <aside className="grid h-fit gap-5"><ActiveTimingPanel limit={2} /><div className="aethos-panel rounded-md p-5"><p className="text-sm font-semibold">Next recommended reflection</p><p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">What would make this interpretation more grounded in lived experience before it becomes a decision input?</p><div className="mt-4"><StatusBadge tone="mixed">reflection</StatusBadge></div></div></aside>
         </section>
         <ResponsibleUseNote compact />
         <ResponsibleUseBoundary />

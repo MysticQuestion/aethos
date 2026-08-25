@@ -9,6 +9,7 @@ import type {
   Planet,
   ZodiacPosition
 } from "../types";
+import type { TransitEvent } from "../types";
 
 export function getCalculationServiceConfig() {
   return {
@@ -193,6 +194,106 @@ export async function createServiceNatalChart(input: {
   }
 
   return response.json() as Promise<CalculationServiceNatalResponse>;
+}
+
+export type CalculationServiceTransitsResponse = {
+  transitEvents: Array<{
+    eventId: string;
+    transitBody: Planet;
+    natalTarget: Planet;
+    aspectType: string;
+    startsAt: string;
+    exactAt: string;
+    endsAt: string;
+    minimumOrb: number;
+    maximumOrb: number;
+    applyingAtStart: boolean;
+    calculationMetadata: CalculationMetadataV2;
+  }>;
+  calculationMetadata: CalculationMetadataV2;
+  warnings: string[];
+};
+
+const supportedAspects = new Set(["conjunction", "sextile", "square", "trine", "opposition"]);
+
+function timingThemes(body: Planet, aspectType: string): TransitEvent["themeContributions"] {
+  const base = aspectType === "square" || aspectType === "opposition" ? 0.78 : 0.55;
+  if (body === "mars") return { Agency: base, Conflict: base, "Decision Pressure": 0.64 };
+  if (body === "saturn") return { Structure: base, "Decision Pressure": 0.58, "Material Stability": 0.5 };
+  if (body === "venus") return { "Relational Patterns": base, "Material Stability": 0.42 };
+  if (body === "mercury") return { Expression: base, "Decision Pressure": 0.44 };
+  if (body === "moon") return { "Inner Life": base, Rest: 0.4 };
+  if (body === "pluto") return { Renewal: base, Conflict: 0.45 };
+  return { Renewal: 0.45, Visibility: 0.35 };
+}
+
+export function normalizeServiceTransits(response: CalculationServiceTransitsResponse): TransitEvent[] {
+  return response.transitEvents
+    .filter((event) => supportedAspects.has(event.aspectType))
+    .map((event) => ({
+      id: event.eventId,
+      eventType: "transit_aspect",
+      transitBody: event.transitBody,
+      natalTarget: event.natalTarget,
+      aspectType: event.aspectType as TransitEvent["aspectType"],
+      orb: event.minimumOrb,
+      exactAt: event.exactAt,
+      startsAt: event.startsAt,
+      endsAt: event.endsAt,
+      themeContributions: timingThemes(event.transitBody, event.aspectType),
+      rationale: `${event.transitBody} ${event.aspectType} natal ${event.natalTarget}; scan-derived service event with a minimum orb of ${event.minimumOrb.toFixed(2)}°.`,
+      metadata: {
+        ...event.calculationMetadata,
+        warnings: response.warnings.length ? response.warnings : event.calculationMetadata.warnings
+      }
+    }));
+}
+
+export async function createServiceTransits(natalChart: NatalChart, startDatetime: string, endDatetime: string) {
+  const config = getCalculationServiceConfig();
+  if (!config.url) throw new Error("AETHOS_CALCULATION_SERVICE_URL is not configured.");
+
+  const planetaryPositions = natalChart.positions.map((position) => ({
+    body: position.body,
+    julianDay: 0,
+    longitude: position.longitude,
+    latitude: position.latitude,
+    distanceAu: position.distanceAu ?? 0,
+    speedLongitude: position.speed.longitudePerDay,
+    speedLatitude: position.speed.latitudePerDay ?? 0,
+    speedDistance: 0,
+    retrograde: position.isRetrograde,
+    stationary: false,
+    zodiacPosition: {
+      sign: position.zodiac.sign,
+      signIndex: position.zodiac.signIndex,
+      degree: position.zodiac.degree,
+      minute: position.zodiac.minute,
+      second: position.zodiac.second,
+      formatted: position.zodiac.formatted
+    },
+    providerMetadata: {
+      providerId: position.providerId,
+      providerVersion: natalChart.metadata.providerVersion,
+      calculationMode: position.calculationMode,
+      ephemerisSource: natalChart.metadata.ephemerisSource,
+      warnings: position.warnings
+    }
+  }));
+
+  const response = await fetch(`${config.url.replace(/\/$/, "")}/v1/transits`, {
+    method: "POST",
+    headers: { "content-type": "application/json", accept: "application/json" },
+    body: JSON.stringify({
+      natalChart: { planetaryPositions },
+      startDatetime,
+      endDatetime,
+      intervalHours: 24
+    }),
+    cache: "no-store"
+  });
+  if (!response.ok) throw new Error(`Calculation service transits request failed with ${response.status}.`);
+  return response.json() as Promise<CalculationServiceTransitsResponse>;
 }
 
 export async function createServiceAstrocartography(payload: Record<string, unknown>) {

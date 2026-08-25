@@ -136,7 +136,7 @@ def test_golden_chart_body_longitudes(chart_name, golden_suite, swiss_provider):
         "historical_dst_sensitive_chart",
     ],
 )
-def test_golden_chart_angles_and_houses(chart_name, golden_suite):
+def test_golden_chart_angles_and_houses(chart_name, golden_suite, swiss_provider):
     chart = next(item for item in golden_suite["charts"] if item["name"] == chart_name)
     payload = dict(chart["input"])
     expected = chart["expected"]
@@ -161,7 +161,7 @@ def test_golden_chart_angles_and_houses(chart_name, golden_suite):
         assert delta <= angle_tol, f"house {house.house} Δ={delta:.6f}°"
 
 
-def test_unknown_birth_time_golden_withholds_houses(golden_suite):
+def test_unknown_birth_time_golden_withholds_houses(golden_suite, swiss_provider):
     chart = next(item for item in golden_suite["charts"] if item["name"] == "unknown_birth_time_chart")
     request = NatalChartRequest.model_validate(chart["input"])
     response = create_natal_chart(request)

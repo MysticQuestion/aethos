@@ -4,8 +4,10 @@ import { createInputHash, attachCalculationMetadata, validateCalculationMetadata
 import { createNatalChart } from "@/lib/aethos/astrology/natal";
 import { demoEphemerisProvider } from "@/lib/aethos/astrology/providers/demo-ephemeris-provider";
 import {
+  normalizeServiceTransits,
   normalizeServiceNatalChart,
-  type CalculationServiceNatalResponse
+  type CalculationServiceNatalResponse,
+  type CalculationServiceTransitsResponse
 } from "@/lib/aethos/astrology/providers/calculation-service-client";
 import { detectRetrograde, detectStation } from "@/lib/aethos/astrology/retrogrades";
 import { generateTransitEvents } from "@/lib/aethos/astrology/transits";
@@ -178,6 +180,39 @@ describe("Aethos backend ephemeris and data layer", () => {
     expect(aggregateThemeScores(transitEvents).length).toBeGreaterThan(0);
     expect(calculateConfidenceScore(transitEvents)).toBeGreaterThan(0);
     expect(windows[0].responsibleUseNote).toContain("interpretation");
+  });
+
+  it("normalizes supported calculation-service transits into timing events", () => {
+    const metadata = attachCalculationMetadata({
+      providerId: "swiss-test",
+      providerVersion: "1",
+      calculationMode: "swiss",
+      sourceInput: { test: true }
+    });
+    const response: CalculationServiceTransitsResponse = {
+      transitEvents: [{
+        eventId: "evt-mars-sun-square",
+        transitBody: "mars",
+        natalTarget: "sun",
+        aspectType: "square",
+        startsAt: "2026-08-01T00:00:00.000Z",
+        exactAt: "2026-08-05T00:00:00.000Z",
+        endsAt: "2026-08-10T00:00:00.000Z",
+        minimumOrb: 0.25,
+        maximumOrb: 6,
+        applyingAtStart: true,
+        calculationMetadata: metadata
+      }],
+      calculationMetadata: metadata,
+      warnings: []
+    };
+
+    const [event] = normalizeServiceTransits(response);
+    const [window] = generateTimingWindows([event]);
+    expect(event).toMatchObject({ transitBody: "mars", aspectType: "square", orb: 0.25 });
+    expect(event.themeContributions.Agency).toBeGreaterThan(0);
+    expect(window.calculationMetadata.calculationMode).toBe("swiss");
+    expect(window.confidenceScore).toBeGreaterThan(calculateConfidenceScore([event], true));
   });
 
   it("compares journal windows to baseline conservatively", async () => {

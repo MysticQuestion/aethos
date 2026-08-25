@@ -27,13 +27,17 @@ describe("Aethos multi-system engines", () => {
     expect(bazi.withheld).toContain("Hour pillar");
   });
 
-  it("runs enabled engines and attaches system layers on profiles", () => {
+  it("keeps research calculators out of permanent natal profiles", () => {
     const kernel = buildDemoKernel();
-    expect(kernel.multiSystem.length).toBeGreaterThanOrEqual(3);
+    expect(kernel.multiSystem).toHaveLength(1);
+    expect(kernel.multiSystem[0].systemKey).toBe("human_design");
     const profile = createSampleAethosProfile();
-    expect(profile.systemLayers.length).toBeGreaterThanOrEqual(4);
+    expect(profile.systemLayers).toHaveLength(3);
     expect(profile.systemLayers.some((layer) => layer.systemKey === "numerology")).toBe(true);
     expect(profile.systemLayers.some((layer) => layer.systemKey === "human_design")).toBe(true);
+    expect(profile.systemLayers.some((layer) => layer.systemKey === "i_ching")).toBe(false);
+    expect(profile.systemLayers.some((layer) => layer.systemKey === "vedic_astrology")).toBe(false);
+    expect(profile.systemLayers.some((layer) => layer.systemKey === "bazi")).toBe(false);
   });
 
   it("is deterministic for same intake", () => {
