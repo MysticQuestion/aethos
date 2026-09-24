@@ -20,10 +20,8 @@ export function hasSupabasePublicConfig() {
 }
 
 export function getSupabaseConfigStatus() {
-  const { url, anonKey } = getSupabasePublicEnv();
   return {
-    configured: Boolean(url && anonKey),
-    urlConfigured: Boolean(url),
-    anonKeyConfigured: Boolean(anonKey),
+    configured: hasSupabasePublicConfig(),
+    requiredEnv: ["NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_ANON_KEY"] as const,
   };
 }
