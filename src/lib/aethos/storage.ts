@@ -11,14 +11,7 @@ export function getStorageMode(): StorageMode {
 }
 
 export function getClientStorageMode(): StorageMode {
-  if (
-    typeof process !== "undefined" &&
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  ) {
-    return "supabase";
-  }
-  return "local_demo";
+  return hasSupabasePublicConfig() ? "supabase" : "local_demo";
 }
 
 export function emptyAethosState(): AethosState {
