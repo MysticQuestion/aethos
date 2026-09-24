@@ -1,12 +1,10 @@
+import { hasSupabasePublicConfig } from "@/lib/supabase/env";
 import type { AethosState, StorageMode } from "./types";
 
 export const AETHOS_STORAGE_KEY = "aethos.local.state.v1";
 
 export function getStorageMode(): StorageMode {
-  if (
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  ) {
+  if (hasSupabasePublicConfig()) {
     return "supabase";
   }
   return "local_demo";
