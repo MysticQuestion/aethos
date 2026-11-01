@@ -3,13 +3,25 @@ import { getSupabaseStoreStatus } from "@/lib/aethos/storage/supabase-store";
 import { getSupabaseConfigStatus, hasSupabasePublicConfig } from "@/lib/supabase/env";
 
 describe("Aethos storage and auth status", () => {
-  it("reports Supabase as unconfigured without public env", () => {
-    expect(hasSupabasePublicConfig()).toBe(false);
-    expect(getSupabaseConfigStatus().configured).toBe(false);
-    const status = getSupabaseStoreStatus(null);
-    expect(status.configured).toBe(false);
-    expect(status.writable).toBe(false);
-    expect(status.authenticated).toBe(false);
+  it("uses canonical Supabase public config without overrides but still requires authentication", () => {
+    const previousUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const previousKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+    delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    try {
+      expect(hasSupabasePublicConfig()).toBe(true);
+      expect(getSupabaseConfigStatus().configured).toBe(true);
+      const status = getSupabaseStoreStatus(null);
+      expect(status.configured).toBe(true);
+      expect(status.writable).toBe(false);
+      expect(status.authenticated).toBe(false);
+    } finally {
+      if (previousUrl === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+      else process.env.NEXT_PUBLIC_SUPABASE_URL = previousUrl;
+      if (previousKey === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      else process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = previousKey;
+    }
   });
 
   it("requires a session before cloud writes even when env is present", () => {
