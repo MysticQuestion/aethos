@@ -112,7 +112,7 @@ describe("Aethos Phase 1 kernel", () => {
     expect(report.journalObservations.length).toBeGreaterThan(0);
   });
 
-  it("defaults to local demo mode without public Supabase env vars", () => {
-    expect(getStorageMode()).toBe("local_demo");
+  it("uses the configured Supabase backend rather than demo storage", () => {
+    expect(getStorageMode()).toBe("supabase");
   });
 });
