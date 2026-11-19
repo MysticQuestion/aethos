@@ -1,0 +1,134 @@
+{
+  "schemaVersion": "aethos-html-prototype-capture-v1",
+  "capturedOn": "2026-11-19",
+  "prototypeSha256": "195c8416fa391df2e988352d8c978d2482429bb49a6e67130304ce50bf4ae468",
+  "engine": "Embedded Astronomy Engine + prototype rules",
+  "tolerance": {
+    "tropicalLongitudeDegrees": 0.005,
+    "ascMcDegrees": 0.003,
+    "houseCuspsDegrees": 0.003
+  },
+  "warning": "These are observed prototype outputs. They do not independently certify downstream interpretations, Human Design, BaZi, or Vedic dasha correctness.",
+  "cases": [
+    {
+      "id": "equator-2000",
+      "input": {
+        "utc": "2000-01-01T12:00:00Z",
+        "latitude": 0,
+        "longitude": 0
+      },
+      "expected": {
+        "ascendantLongitude": 11.374005,
+        "midheavenLongitude": 279.610947,
+        "houseSystem": "Placidus",
+        "ayanamsa": 23.85306,
+        "vedicMoonLongitude": 199.470831,
+        "humanDesign": {
+          "type": "Manifesting Generator",
+          "profile": "1/4"
+        },
+        "planetLongitudes": {
+          "Sun": 280.368739,
+          "Moon": 223.323891,
+          "Mercury": 271.888912,
+          "Venus": 241.565233,
+          "Mars": 327.963899,
+          "Jupiter": 25.2542,
+          "Saturn": 40.396124,
+          "Uranus": 314.806105,
+          "Neptune": 303.195442,
+          "Pluto": 251.454735
+        }
+      }
+    },
+    {
+      "id": "midlatitude-2024",
+      "input": {
+        "utc": "2024-06-21T19:00:00Z",
+        "latitude": 37.8,
+        "longitude": -122.27
+      },
+      "expected": {
+        "ascendantLongitude": 166.308146,
+        "midheavenLongitude": 74.510926,
+        "houseSystem": "Placidus",
+        "ayanamsa": 24.194915,
+        "vedicMoonLongitude": 243.472597,
+        "humanDesign": {
+          "type": "Manifestor",
+          "profile": "3/5"
+        },
+        "planetLongitudes": {
+          "Sun": 90.8803,
+          "Moon": 267.667512,
+          "Mercury": 99.432977,
+          "Venus": 95.561952,
+          "Mars": 39.284402,
+          "Jupiter": 66.186863,
+          "Saturn": 349.372639,
+          "Uranus": 55.281605,
+          "Neptune": 359.90438,
+          "Pluto": 301.569944
+        }
+      }
+    },
+    {
+      "id": "polar-2020",
+      "input": {
+        "utc": "2020-02-01T00:00:00Z",
+        "latitude": 70,
+        "longitude": 0
+      },
+      "expected": {
+        "ascendantLongitude": 200.0195,
+        "midheavenLongitude": 128.252307,
+        "houseSystem": "Whole Sign (Placidus undefined at this latitude)",
+        "ayanamsa": 24.133615,
+        "vedicMoonLongitude": 5.635903,
+        "humanDesign": {
+          "type": "Generator",
+          "profile": "5/1"
+        },
+        "planetLongitudes": {
+          "Sun": 311.572611,
+          "Moon": 29.769517,
+          "Mercury": 325.98347,
+          "Venus": 351.916709,
+          "Mars": 259.394573,
+          "Jupiter": 283.670102,
+          "Saturn": 295.043004,
+          "Uranus": 32.840497,
+          "Neptune": 347.082737,
+          "Pluto": 293.415084
+        }
+      }
+    }
+  ],
+  "calendarTests": [
+    {
+      "id": "tz-spring-gap",
+      "input": {
+        "local": "2024-03-10T02:30:00",
+        "ianaTimezone": "America/Los_Angeles"
+      },
+      "expectedFutureBehavior": "reject_nonexistent_local_time",
+      "observedPrototypeUtc": "2024-03-10T09:30:00Z",
+      "observedRoundTripLocal": "2024-03-10T01:30:00"
+    },
+    {
+      "id": "tz-fall-repeat",
+      "input": {
+        "local": "2024-11-03T01:30:00",
+        "ianaTimezone": "America/Los_Angeles"
+      },
+      "expectedFutureBehavior": "prompt_for_explicit_offset_or_dst_occurrence",
+      "observedPrototypeUtc": "2024-11-03T08:30:00Z"
+    }
+  ],
+  "tzolkinAnchor": {
+    "civilDate": "2012-12-21",
+    "kin": 160,
+    "tone": 4,
+    "seal": "Yellow Sun"
+  }
+}
